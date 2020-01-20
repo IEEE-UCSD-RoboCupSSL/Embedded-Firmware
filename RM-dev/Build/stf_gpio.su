@@ -1,0 +1,7 @@
+gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
+stf_gpio.cpp:5:6:void stf::GPIO::write(stf::logic_level)	16	static
+stf_gpio.cpp:15:13:stf::logic_level stf::GPIO::read()	16	static
+stf_gpio.cpp:19:6:void stf::GPIO::toggle()	16	static
+stf_gpio.cpp:26:1:void __static_initialization_and_destruction_0(int, int)	16	static
+stf_gpio.cpp:26:1:cpp)	8	static
+stf_gpio.cpp:26:1:cpp)	8	static

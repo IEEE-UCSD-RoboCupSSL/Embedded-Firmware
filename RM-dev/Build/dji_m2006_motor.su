@@ -1,0 +1,7 @@
+gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
+dji_m2006_motor.cpp:9:6:void DjiRM::M2006_Motor::init()	16	static
+dji_m2006_motor.cpp:28:6:void DjiRM::M2006_Motor::set_current(int16_t, int16_t, int16_t, int16_t)	32	static
+dji_m2006_motor.cpp:55:6:void DjiRM::M2006_Motor::motor_test()	48	static
+dji_m2006_motor.cpp:73:1:void __static_initialization_and_destruction_0(int, int)	16	static
+dji_m2006_motor.cpp:73:1:cpp)	8	static
+dji_m2006_motor.cpp:73:1:cpp)	8	static

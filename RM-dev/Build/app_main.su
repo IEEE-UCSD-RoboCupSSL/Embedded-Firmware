@@ -1,0 +1,11 @@
+gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
+stf_gpio.h:17:9:stf::GPIO::GPIO(GPIO_TypeDef*, uint16_t)	24	static
+stf_gpio.h:21:9:stf::GPIO::~GPIO()	16	static
+dji_m2006_motor.h:18:9:DjiRM::M2006_Motor::M2006_Motor(CAN_HandleTypeDef*)	16	static
+dji_m2006_motor.h:22:9:DjiRM::M2006_Motor::~M2006_Motor()	16	static
+app_main.cpp:23:6:void setup()	8	static
+app_main.cpp:27:6:void loop0()	16	static
+app_main.cpp:37:6:void loop1()	8	static
+app_main.cpp:46:1:void __static_initialization_and_destruction_0(int, int)	16	static
+app_main.cpp:46:1:cpp)	8	static
+app_main.cpp:46:1:cpp)	8	static
