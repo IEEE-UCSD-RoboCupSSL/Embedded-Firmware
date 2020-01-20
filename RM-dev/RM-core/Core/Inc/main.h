@@ -58,8 +58,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define Motor_Power_Switch_Pin GPIO_PIN_2
-#define Motor_Power_Switch_GPIO_Port GPIOH
+#define Motor_Power_Switch_02_Pin GPIO_PIN_2
+#define Motor_Power_Switch_02_GPIO_Port GPIOH
 #define Button_Pin GPIO_PIN_2
 #define Button_GPIO_Port GPIOB
 #define Red_LED_Pin GPIO_PIN_11

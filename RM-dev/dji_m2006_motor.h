@@ -17,7 +17,6 @@ namespace DjiRM {
     public:
         M2006_Motor(CAN_HandleTypeDef *hcanx) {
             this->hcanx = hcanx;
-            init();
         }
         ~M2006_Motor(void) {
 

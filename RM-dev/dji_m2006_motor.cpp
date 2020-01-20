@@ -53,20 +53,60 @@ void M2006_Motor::set_current(int16_t ESC1_Curr, int16_t ESC2_Curr, int16_t ESC3
 }
 
 void M2006_Motor::motor_test(void) {
-    int test_T = 100;
+    int test_T = 50;
+
+    // M1
     for(int curr = 0; curr < 9500; curr += 100) {
         set_current(curr, 0, 0, 0);
         stf::delay(test_T);
     }
+    for(int curr = 9500; curr > -9500; curr -= 100) {
+        set_current(curr, 0, 0, 0);
+        stf::delay(test_T);
+    }
+    for(int curr = -9500; curr < 0; curr += 100) {
+        set_current(curr, 0, 0, 0);
+        stf::delay(test_T);
+    }
+
+    // M2
     for(int curr = 0; curr < 9500; curr += 100) {
         set_current(0, curr, 0, 0);
         stf::delay(test_T);
     }
+    for(int curr = 9500; curr > -9500; curr -= 100) {
+        set_current(0, curr, 0, 0);
+        stf::delay(test_T);
+    }
+    for(int curr = -9500; curr < 0; curr += 100) {
+        set_current(0, curr, 0, 0);
+        stf::delay(test_T);
+    }
+
+    // M3
     for(int curr = 0; curr < 9500; curr += 100) {
         set_current(0, 0, curr, 0);
         stf::delay(test_T);
     }
+    for(int curr = 9500; curr > -9500; curr -= 100) {
+        set_current(0, 0, curr, 0);
+        stf::delay(test_T);
+    }
+    for(int curr = -9500; curr < 0; curr += 100) {
+        set_current(0, 0, curr, 0);
+        stf::delay(test_T);
+    }
+    
+    // M4
     for(int curr = 0; curr < 9500; curr += 100) {
+        set_current(0, 0, 0, curr);
+        stf::delay(test_T);
+    }
+    for(int curr = 9500; curr > -9500; curr -= 100) {
+        set_current(0, 0, 0, curr);
+        stf::delay(test_T);
+    }
+    for(int curr = -9500; curr < 0; curr += 100) {
         set_current(0, 0, 0, curr);
         stf::delay(test_T);
     }
