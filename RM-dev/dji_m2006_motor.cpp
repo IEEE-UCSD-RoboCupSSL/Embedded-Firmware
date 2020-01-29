@@ -6,7 +6,21 @@
 
 using namespace DjiRM;
 
+static const int16_t max_current = 9900; // 9.9A
+
+static CAN_HandleTypeDef* __hcanx;
+static const uint32_t motor1_can_id = 0x201;
+static const uint32_t motor2_can_id = 0x202;
+static const uint32_t motor3_can_id = 0x203;
+static const uint32_t motor4_can_id = 0x204;
+static volatile uint8_t motor_idx;
+static volatile uint16_t angle_data[4];
+static volatile uint16_t speed_data[4];
+static volatile uint16_t torque_data[4];
+
 void M2006_Motor::init(void) {
+    __hcanx = hcanx;
+
     // Configure CAN filter
     filter_config.FilterBank = 0;
     filter_config.FilterMode = CAN_FILTERMODE_IDMASK;
@@ -23,10 +37,12 @@ void M2006_Motor::init(void) {
     // Start
     HAL_CAN_Start(hcanx);
 
+    // Activate CAN receive interrupt for encoder data
+    HAL_CAN_ActivateNotification(hcanx, CAN_IT_RX_FIFO0_MSG_PENDING);
+
 }
 
 void M2006_Motor::set_current(int16_t ESC1_Curr, int16_t ESC2_Curr, int16_t ESC3_Curr, int16_t ESC4_Curr) {
-    int16_t max_current = 9500; // 9.5A
     if(ESC1_Curr > max_current) ESC1_Curr = max_current;
     if(ESC1_Curr < -max_current) ESC1_Curr = -max_current;
     if(ESC2_Curr > max_current) ESC1_Curr = max_current;
@@ -53,61 +69,63 @@ void M2006_Motor::set_current(int16_t ESC1_Curr, int16_t ESC2_Curr, int16_t ESC3
 }
 
 void M2006_Motor::motor_test(void) {
-    int test_T = 50;
+    int increment_T = 3; // 3 milliseconds delay for every current increment
+    int16_t current_increment = 10; // 0.1A increment
 
-    // M1
-    for(int curr = 0; curr < 9500; curr += 100) {
-        set_current(curr, 0, 0, 0);
-        stf::delay(test_T);
+    for(int rnd = 0; rnd < 4; rnd++) {
+        for(int16_t curr = 0; curr < max_current; curr += current_increment) {
+            if(rnd == 0) set_current(curr, 0, 0, 0);
+            if(rnd == 1) set_current(0, curr, 0, 0);
+            if(rnd == 2) set_current(0, 0, curr, 0);
+            if(rnd == 3) set_current(0, 0, 0, curr);
+            stf::delay(increment_T);
+        }
+        for(int16_t curr = max_current; curr > -max_current; curr -= current_increment) {
+            if(rnd == 0) set_current(curr, 0, 0, 0);
+            if(rnd == 1) set_current(0, curr, 0, 0);
+            if(rnd == 2) set_current(0, 0, curr, 0);
+            if(rnd == 3) set_current(0, 0, 0, curr);
+            stf::delay(increment_T);
+        }
+        for(int16_t curr = -max_current; curr < 0; curr += current_increment) {
+            if(rnd == 0) set_current(curr, 0, 0, 0);
+            if(rnd == 1) set_current(0, curr, 0, 0);
+            if(rnd == 2) set_current(0, 0, curr, 0);
+            if(rnd == 3) set_current(0, 0, 0, curr);
+            stf::delay(increment_T);
+        }
     }
-    for(int curr = 9500; curr > -9500; curr -= 100) {
-        set_current(curr, 0, 0, 0);
-        stf::delay(test_T);
-    }
-    for(int curr = -9500; curr < 0; curr += 100) {
-        set_current(curr, 0, 0, 0);
-        stf::delay(test_T);
-    }
+}
 
-    // M2
-    for(int curr = 0; curr < 9500; curr += 100) {
-        set_current(0, curr, 0, 0);
-        stf::delay(test_T);
-    }
-    for(int curr = 9500; curr > -9500; curr -= 100) {
-        set_current(0, curr, 0, 0);
-        stf::delay(test_T);
-    }
-    for(int curr = -9500; curr < 0; curr += 100) {
-        set_current(0, curr, 0, 0);
-        stf::delay(test_T);
-    }
 
-    // M3
-    for(int curr = 0; curr < 9500; curr += 100) {
-        set_current(0, 0, curr, 0);
-        stf::delay(test_T);
+/* Read encoder in FMP0 interrupt that triggers 
+ * everytime a new message arrived through CAN
+ */
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
+
+    if(hcan == __hcanx) {
+        uint8_t rx_data[8];
+        CAN_RxHeaderTypeDef rx_header;
+        HAL_CAN_GetRxMessage(__hcanx, CAN_RX_FIFO0, &rx_header, rx_data);
+
+        if(rx_header.StdId == motor1_can_id) motor_idx = 0;
+        if(rx_header.StdId == motor2_can_id) motor_idx = 1;
+        if(rx_header.StdId == motor3_can_id) motor_idx = 2;
+        if(rx_header.StdId == motor4_can_id) motor_idx = 3;
+
+        angle_data[motor_idx] = (uint16_t)(rx_data[0]<<8 | rx_data[1]);
+        speed_data[motor_idx] = (uint16_t)(rx_data[2]<<8 | rx_data[3]);
+        torque_data[motor_idx] = (uint16_t)(rx_data[4]<<8 | rx_data[5]);
     }
-    for(int curr = 9500; curr > -9500; curr -= 100) {
-        set_current(0, 0, curr, 0);
-        stf::delay(test_T);
-    }
-    for(int curr = -9500; curr < 0; curr += 100) {
-        set_current(0, 0, curr, 0);
-        stf::delay(test_T);
-    }
-    
-    // M4
-    for(int curr = 0; curr < 9500; curr += 100) {
-        set_current(0, 0, 0, curr);
-        stf::delay(test_T);
-    }
-    for(int curr = 9500; curr > -9500; curr -= 100) {
-        set_current(0, 0, 0, curr);
-        stf::delay(test_T);
-    }
-    for(int curr = -9500; curr < 0; curr += 100) {
-        set_current(0, 0, 0, curr);
-        stf::delay(test_T);
-    }
+}
+
+
+uint16_t M2006_Motor::get_raw_angle(motor_id m_id) {
+    return angle_data[m_id];
+}
+uint16_t M2006_Motor::get_raw_speed(motor_id m_id) {
+    return speed_data[m_id];
+}
+uint16_t M2006_Motor::get_raw_torque(motor_id m_id) {
+    return speed_data[m_id];
 }

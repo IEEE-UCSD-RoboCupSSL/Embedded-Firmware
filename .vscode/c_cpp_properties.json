@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "stm32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F427xx",
+                "USE_HAL_DRIVER",
+                "DEBUG=1"
+            ],
+            "compilerPath": "C:\\Program Files (x86)\\GNU Tools Arm Embedded\\7 2018-q2-update\\bin\\arm-none-eabi-gcc.exe",
+            "compilerArgs": [
+				"-mcpu=cortex-m4",
+				"-mthumb",
+				"-mfloat-abi=hard"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}

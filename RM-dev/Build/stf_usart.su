@@ -1,4 +1,23 @@
 gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
-stf_systick.h:12:1:void __static_initialization_and_destruction_0(int, int)	16	static
-stf_systick.h:12:1:h)	8	static
-stf_systick.h:12:1:h)	8	static
+stf_usart.h:58:36:UART_HandleTypeDef* stf::USART::get_huartx()	16	static
+stf_usart.h:63:21:void stf::USART::set_tx_status(stf::periph_status)	16	static
+stf_usart.h:64:21:void stf::USART::set_rx_status(stf::periph_status)	16	static
+stf_usart.cpp:27:1:stf::USART::USART(UART_HandleTypeDef*, uint32_t, uint32_t)	24	static
+stf_usart.cpp:38:1:stf::USART::~USART()	16	static
+stf_usart.cpp:45:6:void stf::USART::hal_transmit(char*, stf::periph_mode)	144	static
+stf_usart.cpp:99:6:void stf::USART::transmit(std::__cxx11::string&, stf::periph_mode)	24	static
+stf_usart.cpp:104:6:void stf::USART::transmit(char*, stf::periph_mode)	24	static
+stf_usart.cpp:108:6:void stf::USART::transmit(byte_t, stf::periph_mode)	16	static
+stf_usart.cpp:114:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	24	static
+stf_usart.cpp:123:13:void usart_transmit_completed_interrupt_task(stf::USART*)	16	static
+stf_usart.cpp:128:6:void stf::USART::hal_receive(char*, uint16_t, stf::periph_mode)	144	static
+stf_usart.cpp:192:13:std::__cxx11::string stf::USART::receive(uint16_t)	40	static
+stf_usart.cpp:200:6:void stf::USART::receive(char*, uint16_t, stf::periph_mode)	24	static
+stf_usart.cpp:209:8:byte_t stf::USART::receive()	16	static
+stf_usart.cpp:215:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	24	static
+stf_usart.cpp:224:13:void usart_receive_completed_interrupt_task(stf::USART*)	16	static
+stf_usart.cpp:230:19:const string stf::USART::readWord()	80	static
+stf_usart.cpp:246:19:const string stf::USART::readLine()	80	static
+stf_usart.cpp:260:1:void __static_initialization_and_destruction_0(int, int)	24	static
+stf_usart.cpp:260:1:cpp)	8	static
+stf_usart.cpp:260:1:cpp)	8	static

@@ -28,6 +28,7 @@ Build/stf_dependancy.o: stm32-thalamus/src/stf_dependancy.cpp \
  RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
+ RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
@@ -95,6 +96,8 @@ RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h:
 RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 
 RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
+
+RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
 RM-core/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
 

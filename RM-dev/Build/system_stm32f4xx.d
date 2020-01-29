@@ -26,7 +26,8 @@ Build/system_stm32f4xx.o: RM-core/Core/Src/system_stm32f4xx.c \
  RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h \
  RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
- RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
+ RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
+ RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 
 RM-core/Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h:
 
@@ -83,3 +84,5 @@ RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h:
 RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 
 RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
+
+RM-core/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
