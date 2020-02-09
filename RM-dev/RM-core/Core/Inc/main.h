@@ -60,6 +60,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define Motor_Power_Switch_02_Pin GPIO_PIN_2
 #define Motor_Power_Switch_02_GPIO_Port GPIOH
+#define SPI5_CS_Pin GPIO_PIN_6
+#define SPI5_CS_GPIO_Port GPIOF
 #define Button_Pin GPIO_PIN_2
 #define Button_GPIO_Port GPIOB
 #define Red_LED_Pin GPIO_PIN_11

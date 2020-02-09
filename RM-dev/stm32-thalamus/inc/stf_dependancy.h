@@ -68,7 +68,7 @@ typedef uint8_t byte_t;
 
 
 
-__weak void exception(std::string str);
+__weak void exception(const char* str);
 
 
 #endif

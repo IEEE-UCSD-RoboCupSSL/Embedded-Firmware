@@ -1,5 +1,6 @@
 #include "app_main.h"
 #include "dji_m2006_motor.h"
+#include "mpu6500_ist8310.h"
 
 #include <iostream>
 #include <vector>
@@ -21,6 +22,13 @@ USART serial(&huart2);
 extern CAN_HandleTypeDef hcan1;
 DjiRM::M2006_Motor motors(&hcan1);
 
+extern SPI_HandleTypeDef hspi4;
+SPI ras_spi(&hspi4);
+
+extern SPI_HandleTypeDef hspi5;
+SPI imu_spi(&hspi5);
+GPIO imu_chip_select(SPI5_CS_GPIO_Port, SPI5_CS_Pin);
+MPU6500 imu(imu_spi, imu_chip_select);
 
 
 
@@ -28,14 +36,33 @@ bool blinkLED_swicth = true;
 
 void setup(void) {
     serial << "Hello World" << stf::endl;
-    motor_power_switch_02.write(High);
+    byte_t id = imu.init();
+    serial << "IMU[MPU6500] ID = " << id << stf::endl;
+
+    //motor_power_switch_02.write(High);
 }
 
 void loop0(void) {
-    motors.init();
-    while(button.read() == Low);
+    //motors.init();
+    //while(button.read() == Low);
     blinkLED_swicth = false;
     
+/*
+    ras_spi.set_txrx_timeout(1000000);
+
+    string str;
+    string dummy_str = "xxxx";
+    while(1) {
+        serial << "[receiving ...]" << stf::endl;
+        //serial << ras_spi.get_txrx_status() << ", " << ras_spi.get_txrx_status() << stf::endl;
+        str = ras_spi.tranceive(dummy_str); 
+        serial << str << stf::endl;
+        delay(500);
+    }
+*/
+
+
+    /*
     uint16_t angle, speed, torque;
 
     while(1) {
@@ -47,6 +74,7 @@ void loop0(void) {
         serial << "[Speed : " << speed  << "]";
         serial << "[Torque: " << torque << "]" << stf::endl;
     }
+    */
 }
 
 
@@ -61,4 +89,8 @@ void loop1(void) {
        green_led.write(Low);
        red_led.write(High);
    }
+}
+
+void exception(const char* str) {
+    serial << string(str) << stf::endl;
 }

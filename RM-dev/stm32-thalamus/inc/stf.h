@@ -7,6 +7,7 @@
 #include "stf_i2c.h"
 #include "stf_spi.h"
 #include "stf_util.h"
+#include "stf_timer.h"
 
 
 //====================================================================//

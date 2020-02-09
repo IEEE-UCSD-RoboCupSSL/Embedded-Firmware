@@ -262,6 +262,7 @@ erase-all:
 	erase-all
 	print-handle-defs
 	print-IO-defs
+	magic
 
 #Clean
 Clean:
@@ -324,6 +325,9 @@ print-handle-defs:
 print-IO-defs:
 	@sed -n '/define/p' ./$(FDIR)/Core/Inc/main.h  
 
+magic:
+	@make print-handle-defs
+	@make print-IO-defs
 #utility
 
 #call graph generator using cflow, c only, c++ not supported

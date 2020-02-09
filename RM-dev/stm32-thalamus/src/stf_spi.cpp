@@ -28,6 +28,8 @@ SPI::SPI(SPI_HandleTypeDef *hspix, uint32_t tx_buffer_size, uint32_t rx_buffer_s
 
     tx_status = Initialized;
     rx_status = Initialized;
+    txrx_status = Initialized;
+
     active_spis[num_spis++] = this;
 }
 
@@ -228,7 +230,7 @@ void SPI::hal_tranceive(char* tx_str_ptr, char* rx_str_ptr, periph_mode mode) {
     HAL_StatusTypeDef status;
     if(mode == Polling) {
         status = HAL_SPI_TransmitReceive(hspix, (uint8_t*)(tx_str_ptr), (uint8_t*)(rx_str_ptr), 
-                                        strlen(tx_str_ptr), tx_timeout);
+                                        strlen(tx_str_ptr), txrx_timeout);
         if(status == HAL_BUSY) txrx_status = InProgress;
         else if(status == HAL_TIMEOUT) {
             txrx_status = TimeOut;
@@ -281,6 +283,7 @@ std::string SPI::tranceive(std::string& str) {
     if(txrx_status == Completed) 
         return std::string(rx_buffer);
     else return ""; // if error occurs
+    //return std::to_string( strlen(rx_buffer) ); 
 }
 
 void SPI::tranceive(char* tx_str_ptr, char* rx_str_ptr, periph_mode mode) {

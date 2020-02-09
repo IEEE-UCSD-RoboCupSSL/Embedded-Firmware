@@ -9,7 +9,7 @@
 
 #define SPI_Default_TxTimeOut 10000 // 10 seconds
 #define SPI_Default_RxTimeOut 10000 // 10 seconds
-
+#define SPI_Default_TxRxTimeOut 10000 // 10 seconds
 
 #define SPI_Default_Tx_BufferSize 3
 #define SPI_Default_Rx_BufferSize 50
@@ -25,6 +25,7 @@ namespace stf {
         // time-out default
         uint32_t tx_timeout = SPI_Default_TxTimeOut;
         uint32_t rx_timeout = SPI_Default_RxTimeOut;
+        uint32_t txrx_timeout = SPI_Default_TxRxTimeOut;
 
         volatile periph_status tx_status = NotReady;
         volatile periph_status rx_status = NotReady;
@@ -64,6 +65,7 @@ namespace stf {
         inline SPI_HandleTypeDef *get_hspix(void) {  return hspix; }
         inline void set_tx_timeout(uint32_t t) { tx_timeout = t; }
         inline void set_rx_timeout(uint32_t t) { rx_timeout = t;}
+        inline void set_txrx_timeout(uint32_t t) {txrx_timeout = t;}
         inline periph_status get_tx_status() { return tx_status; }
         inline periph_status get_rx_status() { return rx_status; }
         inline periph_status get_txrx_status() { return txrx_status; }

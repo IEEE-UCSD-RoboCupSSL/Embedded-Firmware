@@ -1,4 +1,27 @@
 gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
-stf_systick.h:12:1:void __static_initialization_and_destruction_0(int, int)	16	static
-stf_systick.h:12:1:h)	8	static
-stf_systick.h:12:1:h)	8	static
+stf_spi.h:64:35:SPI_HandleTypeDef* stf::SPI::get_hspix()	16	static
+stf_spi.h:70:21:void stf::SPI::set_tx_status(stf::periph_status)	16	static
+stf_spi.h:71:21:void stf::SPI::set_rx_status(stf::periph_status)	16	static
+stf_spi.cpp:23:1:stf::SPI::SPI(SPI_HandleTypeDef*, uint32_t, uint32_t)	24	static
+stf_spi.cpp:36:1:stf::SPI::~SPI()	16	static
+stf_spi.cpp:43:6:void stf::SPI::hal_transmit(char*, stf::periph_mode)	40	static
+stf_spi.cpp:97:6:void stf::SPI::transmit(std::__cxx11::string&, stf::periph_mode)	24	static
+stf_spi.cpp:102:6:void stf::SPI::transmit(char*, stf::periph_mode)	24	static
+stf_spi.cpp:106:6:void stf::SPI::transmit(byte_t, stf::periph_mode)	16	static
+stf_spi.cpp:112:6:void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef*)	24	static
+stf_spi.cpp:121:13:void spi_transmit_completed_interrupt_task(stf::SPI*)	16	static
+stf_spi.cpp:126:6:void stf::SPI::hal_receive(char*, uint16_t, stf::periph_mode)	40	static
+stf_spi.cpp:190:13:std::__cxx11::string stf::SPI::receive(uint16_t)	40	static
+stf_spi.cpp:198:6:void stf::SPI::receive(char*, uint16_t, stf::periph_mode)	24	static
+stf_spi.cpp:207:8:byte_t stf::SPI::receive()	16	static
+stf_spi.cpp:213:6:void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef*)	24	static
+stf_spi.cpp:222:13:void spi_receive_completed_interrupt_task(stf::SPI*)	16	static
+stf_spi.cpp:227:6:void stf::SPI::hal_tranceive(char*, char*, stf::periph_mode)	56	static
+stf_spi.cpp:281:13:std::__cxx11::string stf::SPI::tranceive(std::__cxx11::string&)	40	static
+stf_spi.cpp:289:6:void stf::SPI::tranceive(char*, char*, stf::periph_mode)	24	static
+stf_spi.cpp:294:8:byte_t stf::SPI::tranceive(byte_t)	16	static
+stf_spi.cpp:304:19:const string stf::SPI::readWord()	80	static
+stf_spi.cpp:320:19:const string stf::SPI::readLine()	80	static
+stf_spi.cpp:334:1:void __static_initialization_and_destruction_0(int, int)	16	static
+stf_spi.cpp:334:1:cpp)	8	static
+stf_spi.cpp:334:1:cpp)	8	static
