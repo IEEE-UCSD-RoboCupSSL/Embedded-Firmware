@@ -31,13 +31,14 @@ GPIO imu_chip_select(SPI5_CS_GPIO_Port, SPI5_CS_Pin);
 MPU6500 imu(imu_spi, imu_chip_select);
 
 
+GPIO ras_spi_cs(SPI4_CS_GPIO_Port, SPI4_CS_Pin);
 
 bool blinkLED_swicth = true;
 
 void setup(void) {
     serial << "Hello World" << stf::endl;
     byte_t id = imu.init();
-    serial << "IMU[MPU6500] ID = " << id << stf::endl;
+    serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
 
     //motor_power_switch_02.write(High);
 }
@@ -47,19 +48,23 @@ void loop0(void) {
     //while(button.read() == Low);
     blinkLED_swicth = false;
     
-/*
+
     ras_spi.set_txrx_timeout(1000000);
 
     string str;
+    byte_t byte;
     string dummy_str = "xxxx";
     while(1) {
         serial << "[receiving ...]" << stf::endl;
         //serial << ras_spi.get_txrx_status() << ", " << ras_spi.get_txrx_status() << stf::endl;
+        while(ras_spi_cs.read() == Low);
         str = ras_spi.tranceive(dummy_str); 
+        //byte = ras_spi.tranceive(0xFF);
+        //serial << (char)byte << stf::endl;
         serial << str << stf::endl;
-        delay(500);
+        //delay(500);
     }
-*/
+
 
 
     /*

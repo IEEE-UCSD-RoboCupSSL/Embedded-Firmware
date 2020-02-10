@@ -41,8 +41,8 @@ Build/stf.o: stm32-thalamus/src/stf.cpp stm32-thalamus/inc/stf.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
  stm32-thalamus/inc/stf_systick.h stm32-thalamus/inc/stf_usart.h \
  stm32-thalamus/inc/stf_i2c.h stm32-thalamus/inc/stf_spi.h \
- stm32-thalamus/inc/stf_util.h RM-core/Core/Inc/main.h \
- stm32-thalamus/inc/stf_dependancy.h
+ stm32-thalamus/inc/stf_util.h stm32-thalamus/inc/stf_timer.h \
+ RM-core/Core/Inc/main.h stm32-thalamus/inc/stf_dependancy.h
 
 stm32-thalamus/inc/stf.h:
 
@@ -137,6 +137,8 @@ stm32-thalamus/inc/stf_i2c.h:
 stm32-thalamus/inc/stf_spi.h:
 
 stm32-thalamus/inc/stf_util.h:
+
+stm32-thalamus/inc/stf_timer.h:
 
 RM-core/Core/Inc/main.h:
 

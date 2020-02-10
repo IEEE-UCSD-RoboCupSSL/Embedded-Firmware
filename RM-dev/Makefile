@@ -227,6 +227,9 @@ interface_config = freq=4000
 connect: 
 	$(cubeprog) -c port=$(interface) $(interface_config)
 
+reset:
+	$(cubeprog) -c port=$(interface) $(interface_config) -rst
+
 #Flash Device (download .elf file from PC/Mac to the correct Flash memory region of the stm32 device)
 #(look up "cross-compilation" online if uncertain about this step)
 flash: default $(target).elf

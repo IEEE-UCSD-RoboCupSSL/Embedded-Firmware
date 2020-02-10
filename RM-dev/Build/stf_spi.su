@@ -1,7 +1,7 @@
 gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
-stf_spi.h:64:35:SPI_HandleTypeDef* stf::SPI::get_hspix()	16	static
-stf_spi.h:70:21:void stf::SPI::set_tx_status(stf::periph_status)	16	static
-stf_spi.h:71:21:void stf::SPI::set_rx_status(stf::periph_status)	16	static
+stf_spi.h:65:35:SPI_HandleTypeDef* stf::SPI::get_hspix()	16	static
+stf_spi.h:72:21:void stf::SPI::set_tx_status(stf::periph_status)	16	static
+stf_spi.h:73:21:void stf::SPI::set_rx_status(stf::periph_status)	16	static
 stf_spi.cpp:23:1:stf::SPI::SPI(SPI_HandleTypeDef*, uint32_t, uint32_t)	24	static
 stf_spi.cpp:36:1:stf::SPI::~SPI()	16	static
 stf_spi.cpp:43:6:void stf::SPI::hal_transmit(char*, stf::periph_mode)	40	static

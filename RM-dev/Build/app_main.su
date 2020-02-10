@@ -2,16 +2,20 @@ gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
 ios_base.h:129:3:constexpr std::_Ios_Openmode std::operator|(std::_Ios_Openmode, std::_Ios_Openmode)	16	static
 stf_gpio.h:17:9:stf::GPIO::GPIO(GPIO_TypeDef*, uint16_t)	24	static
 stf_gpio.h:21:9:stf::GPIO::~GPIO()	16	static
-stf_spi.h:65:21:void stf::SPI::set_tx_timeout(uint32_t)	16	static
+stf_spi.h:68:21:void stf::SPI::set_txrx_timeout(uint32_t)	16	static
 dji_m2006_motor.h:38:9:DjiRM::M2006_Motor::M2006_Motor(CAN_HandleTypeDef*)	16	static
 dji_m2006_motor.h:41:9:DjiRM::M2006_Motor::~M2006_Motor()	16	static
-app_main.cpp:32:6:void setup()	8	static
-app_main.cpp:37:6:void loop0()	88	static
-app_main.cpp:72:6:void loop1()	8	static
-app_main.cpp:84:6:void exception(const char*)	48	static
+mpu6500_ist8310.h:44:5:MPU6500::MPU6500(stf::SPI&, stf::GPIO&)	24	static
+mpu6500_ist8310.h:51:5:MPU6500::~MPU6500()	16	static
+app_main.cpp:38:6:void setup()	16	static
+app_main.cpp:46:6:void loop0()	88	static
+app_main.cpp:87:6:void loop1()	8	static
+app_main.cpp:99:6:void exception(const char*)	48	static
 stf_usart.h:75:13:stf::USART& operator<<(stf::USART&, const T&) [with T = char [12]]	256	static
 stf_usart.h:75:13:stf::USART& operator<<(stf::USART&, const T&) [with T = std::__cxx11::basic_string<char>]	256	static
+stf_usart.h:75:13:stf::USART& operator<<(stf::USART&, const T&) [with T = char [19]]	256	static
+stf_usart.h:75:13:stf::USART& operator<<(stf::USART&, const T&) [with T = int]	256	static
 stf_usart.h:75:13:stf::USART& operator<<(stf::USART&, const T&) [with T = char [16]]	256	static
-app_main.cpp:86:1:void __static_initialization_and_destruction_0(int, int)	16	static
-app_main.cpp:86:1:cpp)	8	static
-app_main.cpp:86:1:cpp)	8	static
+app_main.cpp:101:1:void __static_initialization_and_destruction_0(int, int)	16	static
+app_main.cpp:101:1:cpp)	8	static
+app_main.cpp:101:1:cpp)	8	static

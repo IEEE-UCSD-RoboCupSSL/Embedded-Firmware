@@ -389,6 +389,12 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(Green_LED_GPIO_Port, Green_LED_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin : SPI4_CS_Pin */
+  GPIO_InitStruct.Pin = SPI4_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(SPI4_CS_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin : Motor_Power_Switch_02_Pin */
   GPIO_InitStruct.Pin = Motor_Power_Switch_02_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
