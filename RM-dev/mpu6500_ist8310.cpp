@@ -148,9 +148,93 @@ byte_t MPU6500::read_reg(byte_t address) {
     return rtn;  
 }
 
+/*
+void MPU6500::read_bytes(byte_t address, uint8_t num_bytes, char* buffer) {
+    enable_chip_select();
+    // MSB = 1 for read
+    address = set_byte_msb_one(address);
+    spi_bus_ptr->tranceive(address);
+    
+    char *dummy_tx_bytes = new char(num_bytes);
+    spi_bus_ptr->tranceive(dummy_tx_bytes, buffer);
+    delete dummy_tx_bytes;
+
+    disable_chip_select();
+}
+*/
+
 byte_t MPU6500::init(void) {
-    delay(500, RTOS); //delay to wait for imu pre-heat
+    delay(500); //delay to wait for imu pre-heat
     id = read_reg(MPU6500_WHO_AM_I);
 
+    //Reset Sequence
+    write_reg(MPU6500_PWR_MGMT_1, 0x80); //0x80 == [1000,0000]b | reset
+    delay(100);
+    write_reg(MPU6500_SIGNAL_PATH_RESET, 0x00); //0x00 == [0000,0000]b | reset all signal pat
+    delay(100);
+
+    //Config device
+    write_reg(MPU6500_PWR_MGMT_1, 0x03); //0x03 == [0000,0011]b | Auto select best available clock source
+    delay(1);
+    write_reg(MPU6500_PWR_MGMT_2, 0x00); //0x00 == [0000,0000]b | Enable both accelerometer and gyro
+    delay(1);
+    write_reg(MPU6500_CONFIG, 0x04); /*0x04 == [0000,0100]b | FreeSync & FIFO modes disabled, 
+                                                              DLPF(digital low pass filter) config bit is 4
+                                       Gyro[bandwidth=20Hz, Delay=9.9ms, Fs=1KHz], 
+                                       Temperature sensor[bandwidth=20Hz, Delay=8.3ms] */
+    delay(1);
+    write_reg(MPU6500_GYRO_CONFIG, 0x18); //0x18 == [0001,1000]b | Gyro scale = 2000dps
+    delay(1);
+    write_reg(MPU6500_ACCEL_CONFIG, 0x10); //0x10 == [0001,0000]b | Accel scale = +-8g
+    delay(1);
+    write_reg(MPU6500_ACCEL_CONFIG_2, 0x02); /*0x02 == [0000,0010]b | 
+                                Acc DLPF [bandwidth=92Hz, Delay=7.8ms, Noise Density=220ug/rtHz, Rate=1KHz] */
+    delay(1);
+    write_reg(MPU6500_USER_CTRL, 0x20); /*0x20 == [0010,0000]b | I2C_MST_EN set to 1, Enable the I2C Master I/F 
+                                          module; pins ES_DA and ES_SCL are isolated
+                                          from pins SDA/SDI and SCL/ SCLK. */
+    delay(1);
     return id;
+}
+
+void MPU6500::read_data(void) {
+    accel_x = read_reg(MPU6500_ACCEL_XOUT_H) << 8 | read_reg(MPU6500_ACCEL_XOUT_L);
+    accel_y = read_reg(MPU6500_ACCEL_YOUT_H) << 8 | read_reg(MPU6500_ACCEL_YOUT_L); 
+    accel_z = read_reg(MPU6500_ACCEL_ZOUT_H) << 8 | read_reg(MPU6500_ACCEL_ZOUT_L); 
+    temperature = read_reg(MPU6500_TEMP_OUT_H) << 8 | read_reg(MPU6500_TEMP_OUT_L);
+    gyro_x = read_reg(MPU6500_GYRO_XOUT_H) << 8 | read_reg(MPU6500_GYRO_XOUT_L);
+    gyro_y = read_reg(MPU6500_GYRO_YOUT_H) << 8 | read_reg(MPU6500_GYRO_YOUT_L);
+    gyro_z = read_reg(MPU6500_GYRO_ZOUT_H) << 8 | read_reg(MPU6500_GYRO_ZOUT_L);
+}
+
+
+
+void MPU6500::measure_offset(int iter) {
+    gyro_x_offset = 0; gyro_y_offset = 0; gyro_z_offset = 0;
+    accel_x_offset = 0; accel_y_offset = 0; accel_z_offset = 0;
+    for(int i = 0; i < iter; i++) {    
+        read_data();
+        gyro_x_offset += gyro_x; gyro_y_offset += gyro_y; gyro_z_offset += gyro_z;
+        accel_x_offset += accel_x; accel_y_offset += accel_y;  accel_z_offset += accel_z;
+        delay(5);
+    }
+    gyro_x_offset /= iter; gyro_y_offset /= iter; gyro_z_offset /= iter;
+    accel_x_offset /= iter; accel_y_offset /= iter; accel_z_offset /= iter;
+}
+
+void MPU6500::set_gyro_full_scale_range(GyroScale scale) {
+   delay(1);
+   if(scale == _250dps) write_reg(MPU6500_GYRO_CONFIG, 0x00);
+   if(scale == _500dps) write_reg(MPU6500_GYRO_CONFIG, 0x08);
+   if(scale == _1000dps) write_reg(MPU6500_GYRO_CONFIG, 0x10);
+   if(scale == _2000dps) write_reg(MPU6500_GYRO_CONFIG, 0x18);
+   delay(1);
+}
+void MPU6500::set_accel_full_scale_range(AccelScale scale) {
+   delay(1);
+   if(scale == _2g) write_reg(MPU6500_ACCEL_CONFIG, 0x00);
+   if(scale == _4g) write_reg(MPU6500_ACCEL_CONFIG, 0x08);
+   if(scale == _8g) write_reg(MPU6500_ACCEL_CONFIG, 0x10);
+   if(scale == _16g) write_reg(MPU6500_ACCEL_CONFIG, 0x18);
+   delay(1);
 }
