@@ -1,11 +1,16 @@
 gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
+stf_spi.h:108:16:byte_t stf::SPI::tranceive(byte_t)	24	static
 stf_util.h:9:16:uint8_t set_byte_msb_zero(uint8_t)	16	static
 stf_util.h:13:16:uint8_t set_byte_msb_one(uint8_t)	16	static
-mpu6500_ist8310.h:30:10:void MPU6500::enable_chip_select()	16	static
-mpu6500_ist8310.h:31:10:void MPU6500::disable_chip_select()	16	static
+mpu6500_ist8310.h:37:10:void MPU6500::enable_chip_select()	16	static
+mpu6500_ist8310.h:38:10:void MPU6500::disable_chip_select()	16	static
 mpu6500_ist8310.cpp:132:6:void MPU6500::write_reg(byte_t, byte_t)	16	static
 mpu6500_ist8310.cpp:140:8:byte_t MPU6500::read_reg(byte_t)	24	static
-mpu6500_ist8310.cpp:151:8:byte_t MPU6500::init()	16	static
-mpu6500_ist8310.cpp:156:1:void __static_initialization_and_destruction_0(int, int)	16	static
-mpu6500_ist8310.cpp:156:1:cpp)	8	static
-mpu6500_ist8310.cpp:156:1:cpp)	8	static
+mpu6500_ist8310.cpp:166:8:byte_t MPU6500::init()	16	static
+mpu6500_ist8310.cpp:202:6:void MPU6500::read_data()	24	static
+mpu6500_ist8310.cpp:214:6:void MPU6500::measure_offset(int)	24	static
+mpu6500_ist8310.cpp:227:6:void MPU6500::set_gyro_full_scale_range(MPU6500::GyroScale)	16	static
+mpu6500_ist8310.cpp:235:6:void MPU6500::set_accel_full_scale_range(MPU6500::AccelScale)	16	static
+mpu6500_ist8310.cpp:242:1:void __static_initialization_and_destruction_0(int, int)	16	static
+mpu6500_ist8310.cpp:242:1:cpp)	8	static
+mpu6500_ist8310.cpp:242:1:cpp)	8	static

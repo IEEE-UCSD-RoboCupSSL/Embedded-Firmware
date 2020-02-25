@@ -43,14 +43,17 @@ private:
     byte_t id;
     enum GyroScale {_250dps, _500dps, _1000dps, _2000dps};
     enum AccelScale {_2g, _4g, _8g, _16g};
+
+    std::stringstream data_ss;
+    
 public:
 
-    int16_t gyro_x, gyro_y, gyro_z;
-    int16_t gyro_x_offset, gyro_y_offset, gyro_z_offset;
+    int16_t gyro_x = 0, gyro_y = 0, gyro_z = 0;
+    int16_t gyro_x_offset = 0, gyro_y_offset = 0, gyro_z_offset = 0;
     
-    int16_t accel_x, accel_y, accel_z;
-    int16_t accel_x_offset, accel_y_offset, accel_z_offset;
-    int16_t temperature;
+    int16_t accel_x = 0, accel_y = 0, accel_z = 0;
+    int16_t accel_x_offset = 0, accel_y_offset = 0, accel_z_offset = 0;
+    int16_t temperature = 0;
 
     
     MPU6500(stf::SPI& spi_bus) {
@@ -76,6 +79,17 @@ public:
 
     byte_t read_who_am_i_reg(void);
     
+    
+
+
+    std::stringstream& data_stream(void) {
+        data_ss.str("");
+        data_ss << "Accel[" << (int)accel_x << ", " << (int)accel_y << "," << (int)accel_z << "] ";
+        data_ss << "Gyro[" << (int)gyro_x << ", " << (int)gyro_y << "," << (int)gyro_z << "] ";
+        data_ss << "Temperature[" << (int)temperature << "]";
+        return data_ss;
+    }
+
 
 
 };

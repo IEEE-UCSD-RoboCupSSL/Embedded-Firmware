@@ -27,8 +27,8 @@ USART* active_usarts[Max_Num_USARTs];
 USART::USART(UART_HandleTypeDef *huartx, uint32_t tx_buffer_size, uint32_t rx_buffer_size) {
     this->huartx = huartx;
 
-    tx_buffer = new char(tx_buffer_size);
-    rx_buffer = new char(rx_buffer_size);
+    tx_buffer = new byte_t(tx_buffer_size);
+    rx_buffer = new byte_t(rx_buffer_size);
 
     tx_status = Initialized;
     rx_status = Initialized;
@@ -41,21 +41,17 @@ USART::~USART() {
 }
 
 
-
-void USART::hal_transmit(char* str_ptr, periph_mode mode) {
+void USART::hal_transmit(byte_t* bytes_ptr, uint16_t num_bytes, periph_mode mode) {
 	if(tx_status == NotReady) return;
 
     HAL_StatusTypeDef status;
     if(mode == Polling) {
-        status = HAL_UART_Transmit(huartx, (uint8_t*)(str_ptr), strlen(str_ptr), tx_timeout);
+        status = HAL_UART_Transmit(huartx, bytes_ptr, num_bytes, tx_timeout);
         if(status == HAL_BUSY) tx_status = InProgress;
         else if(status == HAL_TIMEOUT) {
             tx_status = TimeOut;
-
-            //Unlock Usart
             __HAL_UNLOCK(huartx);
             huartx->gState = HAL_UART_STATE_READY;
-            
             exception("usart_transmit Polling | TimeOut");
         }
         else if(status == HAL_ERROR) {
@@ -71,7 +67,7 @@ void USART::hal_transmit(char* str_ptr, periph_mode mode) {
     if(mode == Interrupt) {
         //check if the previous transmission is completed
         if(tx_status == InProgress) return;
-        status = HAL_UART_Transmit_IT(huartx, (uint8_t*)str_ptr, strlen(str_ptr));
+        status = HAL_UART_Transmit_IT(huartx, bytes_ptr, num_bytes);
         if(status == HAL_ERROR) {
             tx_status = Error;
             exception("usart_transmit interrupt | Error");
@@ -84,7 +80,7 @@ void USART::hal_transmit(char* str_ptr, periph_mode mode) {
     if(mode == DMA) {
         //check if the previous transmission is completed
         if(tx_status == InProgress) return;
-        status = HAL_UART_Transmit_DMA(huartx, (uint8_t*)str_ptr, strlen(str_ptr));
+        status = HAL_UART_Transmit_DMA(huartx, bytes_ptr, num_bytes);
         if(status == HAL_ERROR) {
             tx_status = Error;
             exception("usart_transmit DMA | Error");
@@ -96,20 +92,7 @@ void USART::hal_transmit(char* str_ptr, periph_mode mode) {
 
 
 
-void USART::transmit(std::string& str, periph_mode mode) {
-	hal_transmit((char*)str.c_str(), mode);
-}
 
-
-void USART::transmit(char* str_ptr, periph_mode mode) {
-    hal_transmit(str_ptr, mode);
-}
-
-void USART::transmit(byte_t byte, periph_mode mode) {
-    tx_buffer[0] = (char)byte;
-    tx_buffer[1] = '\0';
-    hal_transmit(tx_buffer, mode);
-}
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {    
 	for(uint32_t i = 0; i < num_usarts; i++) {
@@ -124,23 +107,20 @@ __weak void usart_transmit_completed_interrupt_task(USART* instance) {
     UNUSED(instance);
 }
 
-
-void USART::hal_receive(char* str_ptr, uint16_t num_bytes, periph_mode mode) {
+void USART::hal_receive(byte_t* bytes_ptr, uint16_t num_bytes, periph_mode mode) {
     if(rx_status == NotReady) return;
 
     HAL_StatusTypeDef status;
     if(mode == Polling) {
         
-	    memset(str_ptr, 0, strlen(str_ptr));
-        status = HAL_UART_Receive(huartx, (uint8_t*)(str_ptr), num_bytes, rx_timeout);
+	    memset(bytes_ptr, 0, num_bytes);
+        status = HAL_UART_Receive(huartx, bytes_ptr, num_bytes, rx_timeout);
         if(status == HAL_BUSY) rx_status = InProgress;
         else if(status == HAL_TIMEOUT) {
             rx_status = TimeOut;
-
             //Unlock Usart
             __HAL_UNLOCK(huartx);
             huartx->gState = HAL_UART_STATE_READY;
-            
             exception("usart_receive Polling | TimeOut");
         }
         else if(status == HAL_ERROR) {
@@ -157,8 +137,8 @@ void USART::hal_receive(char* str_ptr, uint16_t num_bytes, periph_mode mode) {
     if(mode == Interrupt) {
         //check if the previous receiption is completed
         if(rx_status == InProgress) return;
-        memset(str_ptr, 0, strlen(str_ptr));
-        status = HAL_UART_Receive_IT(huartx, (uint8_t*)str_ptr, num_bytes);
+        memset(bytes_ptr, 0, num_bytes);
+        status = HAL_UART_Receive_IT(huartx, bytes_ptr, num_bytes);
         if(status == HAL_ERROR) {
             rx_status = Error;
             exception("usart_receive interrupt | Error");
@@ -171,8 +151,8 @@ void USART::hal_receive(char* str_ptr, uint16_t num_bytes, periph_mode mode) {
     if(mode == DMA) {
         //check if the previous reception is completed
         if(rx_status == InProgress) return;
-        memset(str_ptr, 0, strlen(str_ptr));
-        status = HAL_UART_Receive_DMA(huartx, (uint8_t*)str_ptr, num_bytes);
+        memset(bytes_ptr, 0, num_bytes);
+        status = HAL_UART_Receive_DMA(huartx, bytes_ptr, num_bytes);
         if(status == HAL_ERROR) {
             rx_status = Error;
             exception("usart_receive DMA | Error");
@@ -180,36 +160,6 @@ void USART::hal_receive(char* str_ptr, uint16_t num_bytes, periph_mode mode) {
         }
         rx_status = InProgress;
     }
-}
-
-/* only support Polling mode if the return type is a string, 
- * this is due to c++ string constructor only does deep copy 
- * instead of shallow copy, can't copy a char array (rx_buffer) right away
- * when non-blocking receive is still in the middle of filling
- * content into the array
- * (non-blocking methods are {Interrupt, DMA})
- */
-std::string USART::receive(uint16_t num_bytes) {
-    hal_receive(rx_buffer, num_bytes, Polling);
-    if(rx_status == Completed) 
-        return std::string(rx_buffer);
-    else return ""; // if error occurs
-}
-
-
-void USART::receive(char* buffer_ptr, uint16_t num_bytes, periph_mode mode) {
-    hal_receive(buffer_ptr, num_bytes, mode);
-}
-
-
-/*only support Polling mode due to the peripheral needs 
- *to finish receiption before returning the results
- *it's inherently a blocking method
- */
-byte_t USART::receive(void) {
-    hal_receive(rx_buffer, 1, Polling);
-    if(rx_status == Completed) return (byte_t)rx_buffer[0];
-    else return 0; // if error occurs
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {

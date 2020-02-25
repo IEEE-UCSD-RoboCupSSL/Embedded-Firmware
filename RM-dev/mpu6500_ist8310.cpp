@@ -190,10 +190,12 @@ byte_t MPU6500::init(void) {
     write_reg(MPU6500_ACCEL_CONFIG_2, 0x02); /*0x02 == [0000,0010]b | 
                                 Acc DLPF [bandwidth=92Hz, Delay=7.8ms, Noise Density=220ug/rtHz, Rate=1KHz] */
     delay(1);
-    write_reg(MPU6500_USER_CTRL, 0x20); /*0x20 == [0010,0000]b | I2C_MST_EN set to 1, Enable the I2C Master I/F 
+    //write_reg(MPU6500_USER_CTRL, 0x20); 
+      /*0x20 == [0010,0000]b | I2C_MST_EN set to 1, Enable the I2C Master I/F 
                                           module; pins ES_DA and ES_SCL are isolated
                                           from pins SDA/SDI and SCL/ SCLK. */
     delay(1);
+
     return id;
 }
 
