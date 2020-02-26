@@ -38,13 +38,14 @@ private:
     void disable_chip_select(void) {if(is_hardware_chip_select == false) chip_select_ptr->write(stf::High);}
     void write_reg(byte_t address, byte_t byte);
     byte_t read_reg(byte_t address);
-    //void read_bytes(byte_t address, uint8_t num_bytes, char* buffer);
+    void mpu_i2c_write_reg(byte_t address, byte_t byte);
+    byte_t mpu_i2c_read_reg(byte_t address);
+    void mpu_master_i2c_auto_read_config(uint8_t device_address, uint8_t reg_address, uint8_t num_bytes);
 
     byte_t id;
     enum GyroScale {_250dps, _500dps, _1000dps, _2000dps};
     enum AccelScale {_2g, _4g, _8g, _16g};
 
-    std::stringstream data_ss;
     
 public:
 
@@ -53,7 +54,12 @@ public:
     
     int16_t accel_x = 0, accel_y = 0, accel_z = 0;
     int16_t accel_x_offset = 0, accel_y_offset = 0, accel_z_offset = 0;
-    int16_t temperature = 0;
+
+    int16_t compass_x = 0, compass_y = 0, compass_z = 0;
+    int16_t compass_x_offset = 0, compass_y_offset = 0, compass_z_offset = 0;
+
+    double temperature = 0; // degree celsius
+
 
     
     MPU6500(stf::SPI& spi_bus) {
@@ -72,25 +78,22 @@ public:
 
     byte_t init(void);
     void measure_offset(int iter = 300);
-    void read_data(void);
+    void read_accel_data(void);
+    void read_gyro_data(void);
+    void read_temp_data(void);
+    void read_compass_data(void);
+    void read_data(void) {
+        read_accel_data();
+        read_gyro_data();
+        read_temp_data();
+        read_compass_data();
+    }
 
     void set_gyro_full_scale_range(GyroScale scale);
     void set_accel_full_scale_range(AccelScale scale);
 
     byte_t read_who_am_i_reg(void);
-    
-    
-
-
-    std::stringstream& data_stream(void) {
-        data_ss.str("");
-        data_ss << "Accel[" << (int)accel_x << ", " << (int)accel_y << "," << (int)accel_z << "] ";
-        data_ss << "Gyro[" << (int)gyro_x << ", " << (int)gyro_y << "," << (int)gyro_z << "] ";
-        data_ss << "Temperature[" << (int)temperature << "]";
-        return data_ss;
-    }
-
-
+    std::string data_string(void);
 
 };
 

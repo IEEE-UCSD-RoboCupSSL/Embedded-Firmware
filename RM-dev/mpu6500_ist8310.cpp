@@ -1,5 +1,7 @@
 #include "mpu6500_ist8310.h"
+#include <string.h>
 
+// Code referenced from bsp_imu.c from the example code provided by Dji
 
 /*********************Register Map**********************/
 // Reference: Register Map macros are copy-pasted from the 
@@ -104,6 +106,29 @@
 #define MPU6500_YA_OFFSET_L         (0x7B)
 #define MPU6500_ZA_OFFSET_H         (0x7D)
 #define MPU6500_ZA_OFFSET_L         (0x7E)
+
+
+// IST8310 internal reg address
+#define IST8310_ADDRESS 0x0E
+#define IST8310_DEVICE_ID_A 0x10
+
+// IST8310 register map. For details see IST8310 datasheet
+#define IST8310_WHO_AM_I 0x00
+#define IST8310_R_CONFA 0x0A
+#define IST8310_R_CONFB 0x0B
+#define IST8310_R_MODE 0x02
+
+#define IST8310_R_XL 0x03
+#define IST8310_R_XM 0x04
+#define IST8310_R_YL 0x05
+#define IST8310_R_YM 0x06
+#define IST8310_R_ZL 0x07
+#define IST8310_R_ZM 0x08
+
+#define IST8310_AVGCNTL 0x41
+#define IST8310_PDCNTL 0x42
+
+#define IST8310_ODR_MODE 0x01 //sigle measure mode
 /*
                        _oo0oo_
                       o8888888o
@@ -148,24 +173,82 @@ byte_t MPU6500::read_reg(byte_t address) {
     return rtn;  
 }
 
-/*
-void MPU6500::read_bytes(byte_t address, uint8_t num_bytes, char* buffer) {
-    enable_chip_select();
-    // MSB = 1 for read
-    address = set_byte_msb_one(address);
-    spi_bus_ptr->tranceive(address);
-    
-    char *dummy_tx_bytes = new char(num_bytes);
-    spi_bus_ptr->tranceive(dummy_tx_bytes, buffer);
-    delete dummy_tx_bytes;
-
-    disable_chip_select();
+void MPU6500::mpu_i2c_write_reg(byte_t address, byte_t byte) {
+    write_reg(MPU6500_I2C_SLV1_CTRL, 0x00); // turn off first
+    delay(10);
+    write_reg(MPU6500_I2C_SLV1_REG, address);
+    delay(10);
+    write_reg(MPU6500_I2C_SLV1_DO, byte);
+    delay(10);
+    /* turn on slave 1 with one byte transmitting */
+    write_reg(MPU6500_I2C_SLV1_CTRL, 0x80 | 0x01);
+    /* wait longer to ensure the data is transmitted from slave 1 */
+    delay(10);
 }
-*/
+
+byte_t MPU6500::mpu_i2c_read_reg(byte_t address) {
+    byte_t ret;
+    //write_reg(MPU6500_I2C_SLV4_CTRL, 0x00);
+    //delay(10);
+    write_reg(MPU6500_I2C_SLV4_REG, address);
+    delay(10);
+    write_reg(MPU6500_I2C_SLV4_CTRL, 0x80); // enable reading
+    delay(10);
+    ret = read_reg(MPU6500_I2C_SLV4_DI);
+    /* turn off slave4 after read */
+    write_reg(MPU6500_I2C_SLV4_CTRL, 0x00);
+    delay(10);
+    return ret;
+}
+
+/* (function copy pasted from dji sample code)
+ *initialize the MPU6500 I2C Slave 0 for I2C reading.
+ *device_address: slave device address, Address[6:0]
+ */
+void MPU6500::mpu_master_i2c_auto_read_config(uint8_t device_address, uint8_t reg_address, uint8_t num_bytes)
+{
+    /* 
+	   * configure the device address of the IST8310 
+     * use slave1, auto transmit single measure mode 
+	   */
+    write_reg(MPU6500_I2C_SLV1_ADDR, device_address);
+    delay(2);
+    write_reg(MPU6500_I2C_SLV1_REG, IST8310_R_CONFA);
+    delay(2);
+    write_reg(MPU6500_I2C_SLV1_DO, IST8310_ODR_MODE);
+    delay(2);
+
+    /* use slave0,auto read data */
+    write_reg(MPU6500_I2C_SLV0_ADDR, device_address | 0x80);
+    delay(2);
+    write_reg(MPU6500_I2C_SLV0_REG, reg_address);
+    delay(2);
+
+    /* every eight mpu6500 internal samples one i2c master read */
+    write_reg(MPU6500_I2C_SLV4_CTRL, 0x03);
+    delay(2);
+    /* enable slave 0 and 1 access delay */
+    //write_reg(MPU6500_I2C_MST_DELAY_CTRL, 0x00);
+    write_reg(MPU6500_I2C_MST_DELAY_CTRL, 0x01 | 0x02);
+    delay(2);
+    /* enable slave 1 auto transmit */
+    write_reg(MPU6500_I2C_SLV1_CTRL, 0x80 | 0x01);
+		/* Wait 6ms (minimum waiting time for 16 times internal average setup) */
+    delay(6); 
+    /* enable slave 0 with data_num bytes reading */
+    write_reg(MPU6500_I2C_SLV0_CTRL, 0x80 | num_bytes);
+    delay(2);
+}
+
+
 
 byte_t MPU6500::init(void) {
+
+    /***** init MPU6500 *****/
+
     delay(500); //delay to wait for imu pre-heat
     id = read_reg(MPU6500_WHO_AM_I);
+    delay(1);
 
     //Reset Sequence
     write_reg(MPU6500_PWR_MGMT_1, 0x80); //0x80 == [1000,0000]b | reset
@@ -181,7 +264,7 @@ byte_t MPU6500::init(void) {
     write_reg(MPU6500_CONFIG, 0x04); /*0x04 == [0000,0100]b | FreeSync & FIFO modes disabled, 
                                                               DLPF(digital low pass filter) config bit is 4
                                        Gyro[bandwidth=20Hz, Delay=9.9ms, Fs=1KHz], 
-                                       Temperature sensor[bandwidth=20Hz, Delay=8.3ms] */
+                                       temperature sensor[bandwidth=20Hz, Delay=8.3ms] */
     delay(1);
     write_reg(MPU6500_GYRO_CONFIG, 0x18); //0x18 == [0001,1000]b | Gyro scale = 2000dps
     delay(1);
@@ -190,38 +273,144 @@ byte_t MPU6500::init(void) {
     write_reg(MPU6500_ACCEL_CONFIG_2, 0x02); /*0x02 == [0000,0010]b | 
                                 Acc DLPF [bandwidth=92Hz, Delay=7.8ms, Noise Density=220ug/rtHz, Rate=1KHz] */
     delay(1);
-    //write_reg(MPU6500_USER_CTRL, 0x20); 
+    // Enable I2C supplementary bus for IST8310
+    write_reg(MPU6500_USER_CTRL, 0x20); 
       /*0x20 == [0010,0000]b | I2C_MST_EN set to 1, Enable the I2C Master I/F 
                                           module; pins ES_DA and ES_SCL are isolated
                                           from pins SDA/SDI and SCL/ SCLK. */
-    delay(1);
+    delay(10);
+
+    /***** init IST8310 *****/
+    byte_t byte_read;
+    std::string debug;
+	// enable iic smaster mode 
+    write_reg(MPU6500_USER_CTRL, 0x30); //0x30 == [0011,0000]b
+    delay(10);
+	
+    // enable iic 400khz 
+    write_reg(MPU6500_I2C_MST_CTRL, 0x0D);  // 0x0D == [0000,1101]b 
+    delay(10);
+
+    // turn on slave 1 for ist write and slave 4 to ist read 
+    write_reg(MPU6500_I2C_SLV1_ADDR, IST8310_ADDRESS);  
+    delay(10);
+
+    write_reg(MPU6500_I2C_SLV4_ADDR, IST8310_ADDRESS | 0x80);
+    delay(10);
+
+    mpu_i2c_write_reg(IST8310_R_CONFB, 0x01); 
+    delay(10);
+    byte_read = mpu_i2c_read_reg(IST8310_WHO_AM_I);
+    if(byte_read != IST8310_DEVICE_ID_A) {
+        debug = "IST8310 WHO_AM_I reg not matching: " + std::to_string(byte_read);
+        exception(debug.c_str());
+    }
+    delay(10);
+
+	/* soft reset */
+    mpu_i2c_write_reg(IST8310_R_CONFB, 0x01); 
+    delay(10);
+
+	/* config as ready mode to access register */
+    mpu_i2c_write_reg(IST8310_R_CONFA, 0x00); 
+    delay(10);
+    byte_read = mpu_i2c_read_reg(IST8310_R_CONFA); 
+    if(byte_read != 0x00) {
+        debug = "Config IST8310_R_CONFA failed: " + std::to_string(byte_read);
+        exception(debug.c_str());
+    }
+    delay(10);
+
+	/* normal state, no int */
+    mpu_i2c_write_reg(IST8310_R_CONFB, 0x00);
+    delay(100);
+    byte_read = mpu_i2c_read_reg(IST8310_R_CONFB); 
+    if(byte_read != 0x00) {
+        debug = "Config IST8310_R_CONFB failed: " + std::to_string(byte_read);
+        exception(debug.c_str());
+    }
+    delay(10);
+		
+    /* config low noise mode, x,y,z axis 16 time 1 avg */
+    mpu_i2c_write_reg(IST8310_AVGCNTL, 0x24); //[0010,0100]b
+    delay(10);
+    byte_read = mpu_i2c_read_reg(IST8310_AVGCNTL); 
+    if(byte_read != 0x24) {
+        debug = "Config IST8310_AVGCNTL failed: " + std::to_string(byte_read);
+        exception(debug.c_str());
+    }
+    delay(10);
+
+    /* Set/Reset pulse duration setup,normal mode */
+    mpu_i2c_write_reg(IST8310_PDCNTL, 0xC0);
+    delay(10);
+    mpu_i2c_write_reg(IST8310_PDCNTL, 0xC0);
+    delay(10);
+    byte_read = mpu_i2c_read_reg(IST8310_PDCNTL); 
+    if(byte_read != 0xC0) {
+        debug = "Config IST8310_PDCNTL failed: " + std::to_string(byte_read);
+        exception(debug.c_str());
+    }
+    delay(10);
+
+    /* turn off slave1 & slave 4 */
+    write_reg(MPU6500_I2C_SLV1_CTRL, 0x00);
+    delay(10);
+    write_reg(MPU6500_I2C_SLV4_CTRL, 0x00);
+    delay(10);
+
+    /* configure and turn on slave 0 */
+    mpu_master_i2c_auto_read_config(IST8310_ADDRESS, IST8310_R_XL, 0x06);
+    delay(10);
+
 
     return id;
 }
 
-void MPU6500::read_data(void) {
+void MPU6500::read_accel_data(void) {
     accel_x = read_reg(MPU6500_ACCEL_XOUT_H) << 8 | read_reg(MPU6500_ACCEL_XOUT_L);
     accel_y = read_reg(MPU6500_ACCEL_YOUT_H) << 8 | read_reg(MPU6500_ACCEL_YOUT_L); 
     accel_z = read_reg(MPU6500_ACCEL_ZOUT_H) << 8 | read_reg(MPU6500_ACCEL_ZOUT_L); 
-    temperature = read_reg(MPU6500_TEMP_OUT_H) << 8 | read_reg(MPU6500_TEMP_OUT_L);
+    accel_x -= accel_x_offset; accel_y -= accel_y_offset; accel_z -= accel_z_offset;
+}
+
+void MPU6500::read_gyro_data(void) {
     gyro_x = read_reg(MPU6500_GYRO_XOUT_H) << 8 | read_reg(MPU6500_GYRO_XOUT_L);
     gyro_y = read_reg(MPU6500_GYRO_YOUT_H) << 8 | read_reg(MPU6500_GYRO_YOUT_L);
     gyro_z = read_reg(MPU6500_GYRO_ZOUT_H) << 8 | read_reg(MPU6500_GYRO_ZOUT_L);
+    gyro_x -= gyro_x_offset; gyro_y -= gyro_y_offset; gyro_z -= gyro_z_offset;
+} 
+
+void MPU6500::read_temp_data(void) {
+    int16_t temp = read_reg(MPU6500_TEMP_OUT_H) << 8 | read_reg(MPU6500_TEMP_OUT_L);
+    temperature = temp / 333.87f + 21;
 }
+
+void MPU6500::read_compass_data(void) {
+    compass_x = read_reg(MPU6500_EXT_SENS_DATA_00) << 8 | read_reg(MPU6500_EXT_SENS_DATA_01);
+    compass_y = read_reg(MPU6500_EXT_SENS_DATA_02) << 8 | read_reg(MPU6500_EXT_SENS_DATA_03);
+    compass_z = read_reg(MPU6500_EXT_SENS_DATA_04) << 8 | read_reg(MPU6500_EXT_SENS_DATA_05);
+    compass_x -= compass_x_offset; compass_y -= compass_y_offset; compass_z -= compass_z_offset;
+}
+
 
 
 
 void MPU6500::measure_offset(int iter) {
     gyro_x_offset = 0; gyro_y_offset = 0; gyro_z_offset = 0;
     accel_x_offset = 0; accel_y_offset = 0; accel_z_offset = 0;
+    //compass_x_offset = 0; compass_y_offset = 0; compass_z_offset = 0;
     for(int i = 0; i < iter; i++) {    
-        read_data();
+        read_accel_data();
+        read_gyro_data();
         gyro_x_offset += gyro_x; gyro_y_offset += gyro_y; gyro_z_offset += gyro_z;
         accel_x_offset += accel_x; accel_y_offset += accel_y;  accel_z_offset += accel_z;
+       // compass_x_offset += compass_x; compass_y_offset += compass_y; compass_z_offset += compass_z;
         delay(5);
     }
     gyro_x_offset /= iter; gyro_y_offset /= iter; gyro_z_offset /= iter;
     accel_x_offset /= iter; accel_y_offset /= iter; accel_z_offset /= iter;
+    //compass_x_offset /= iter; compass_y_offset /= iter; compass_z_offset /= iter;
 }
 
 void MPU6500::set_gyro_full_scale_range(GyroScale scale) {
@@ -239,4 +428,15 @@ void MPU6500::set_accel_full_scale_range(AccelScale scale) {
    if(scale == _8g) write_reg(MPU6500_ACCEL_CONFIG, 0x10);
    if(scale == _16g) write_reg(MPU6500_ACCEL_CONFIG, 0x18);
    delay(1);
+}
+
+
+std::string MPU6500::data_string(void) {
+    char str[150];
+    sprintf(str, "Accel[%6d, %6d, %6d] Gyro[%6d, %6d, %6d] Compass[%6d, %6d, %6d] temp[%6lf]", 
+            accel_x, accel_y, accel_z,
+            gyro_x, gyro_y, gyro_z,
+            compass_x, compass_y, compass_z,
+            temperature);
+    return std::string(str);
 }

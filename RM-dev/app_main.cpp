@@ -32,12 +32,18 @@ MPU6500 imu(imu_spi, imu_chip_select);
 
 
 GPIO ras_spi_cs(SPI4_CS_GPIO_Port, SPI4_CS_Pin);
+GPIO ist8310_reset(IST8310_Reset_GPIO_Port, IST8310_Reset_Pin);
 
 bool blinkLED_swicth = true;
 
 void setup(void) {
     serial << "=========================================================" << stf::endl;
+    ist8310_reset.write(Low); // low resets
+    delay(100);
+    ist8310_reset.write(High); // High sets
+
     byte_t id = imu.init();
+    imu.measure_offset();
     serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
 
   
@@ -54,11 +60,12 @@ void loop0(void) {
         imu.read_data();
         
         
-        serial << (imu.data_stream().str()) << stf::endl;
+        serial << imu.data_string() << stf::endl;
         
         delay(500);
     }
 
+/*
     ras_spi.set_txrx_timeout(1000000);
 
     string str;
@@ -74,7 +81,7 @@ void loop0(void) {
         serial << str << stf::endl;
         //delay(500);
     }
-
+*/
 
 
     /*
@@ -97,10 +104,10 @@ void loop0(void) {
 void loop1(void) {
     
     while (blinkLED_swicth == true) {
-       delay(100);
+       delay(300);
        green_led.write(High);
        red_led.write(Low);
-       delay(100);
+       delay(300);
        green_led.write(Low);
        red_led.write(High);
    }

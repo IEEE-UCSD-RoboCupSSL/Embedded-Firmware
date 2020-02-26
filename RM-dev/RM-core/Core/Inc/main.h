@@ -58,6 +58,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define IST8310_Reset_Pin GPIO_PIN_2
+#define IST8310_Reset_GPIO_Port GPIOE
 #define SPI4_CS_Pin GPIO_PIN_4
 #define SPI4_CS_GPIO_Port GPIOE
 #define Motor_Power_Switch_02_Pin GPIO_PIN_2
