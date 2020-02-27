@@ -77,6 +77,12 @@ public:
     ~MPU6500(void) {}
 
     byte_t init(void);
+    byte_t init(stf::GPIO& ist8310_reset) {
+        ist8310_reset.write(stf::Low); // low resets
+        stf::delay(100);
+        ist8310_reset.write(stf::High); // High sets
+        return init();
+    }
     void measure_offset(int iter = 300);
     void read_accel_data(void);
     void read_gyro_data(void);

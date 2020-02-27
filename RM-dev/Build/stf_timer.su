@@ -1,52 +1,35 @@
 gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
-stf_timer.cpp:26:1:stf::TIM::TIM(TIM_HandleTypeDef*, uint32_t, TIM_Resolution)	32	static
-stf_timer.h:44:12:stf::TIM::~TIM()	16	static
-stf_timer.cpp:55:10:uint32_t stf::TIM::getARR()	16	static
-stf_timer.cpp:66:10:uint32_t stf::TIM::getCCR(uint32_t)	16	static
-stf_timer.cpp:76:10:uint32_t stf::TIM::getCNT()	16	static
-stf_timer.cpp:86:10:uint32_t stf::TIM::getPrescaler()	16	static
-stf_timer.cpp:95:6:void stf::TIM::setARR(uint32_t)	16	static
-stf_timer.cpp:117:6:void stf::TIM::setCCR(uint32_t, uint32_t)	24	static
-stf_timer.cpp:127:6:void stf::TIM::setCNT(uint32_t)	16	static
-stf_timer.cpp:137:6:void stf::TIM::setPrescaler(uint32_t)	16	static
-stf_timer.cpp:148:9:static uint8_t stf::TIM::tim_channel_index(uint32_t)	16	static
-stf_timer.cpp:180:6:bool stf::TIM::initBasicCounting(uint32_t, uint32_t)	24	static
-stf_timer.cpp:191:6:bool stf::TIM::setFrequency(uint32_t)	24	static
-stf_timer.cpp:210:6:void stf::TIM::countBegin()	16	static
-stf_timer.cpp:218:6:void stf::TIM::countEnd()	16	static
-stf_timer.cpp:226:6:void stf::TIM::countBeginIT()	16	static
-stf_timer.cpp:234:6:void stf::TIM::countEndIT()	16	static
-stf_timer.cpp:244:10:uint32_t stf::TIM::getCount()	16	static
-stf_timer.cpp:253:13:void timPE_IT_CallBack(stf::TIM*)	16	static
-stf_timer.cpp:262:13:void timSysT_IT_CallBack(stf::TIM*)	16	static
-stf_timer.cpp:316:6:bool stf::TIM::initPwmOut(uint32_t, uint32_t)	24	static
-stf_timer.cpp:329:6:bool stf::TIM::setPwmFrequency(uint32_t, uint32_t)	48	static
-stf_timer.cpp:351:6:void stf::TIM::pwmGenBegin(uint32_t)	16	static
-stf_timer.cpp:361:6:void stf::TIM::pwmGenEnd(uint32_t)	16	static
-stf_timer.cpp:371:6:void stf::TIM::setPwmDutyCycle(uint32_t, uint32_t)	24	static
-stf_timer.cpp:381:6:void stf::TIM::pwmWrite(uint32_t, double)	32	static
-stf_timer.cpp:409:6:bool stf::TIM::initPwmIn(stf::TIM::TIM_IC*, uint32_t, uint32_t)	40	static
-stf_timer.cpp:436:6:void stf::TIM::pwmIcBegin(uint32_t, PulseLevel)	24	static
-stf_timer.cpp:453:6:void stf::TIM::pwmIcEnd(uint32_t)	16	static
-stf_timer.cpp:463:9:int32_t stf::TIM::getPulseWidth(uint32_t)	24	static
-stf_timer.cpp:473:8:double stf::TIM::pwmRead(uint32_t)	24	static
-stf_timer.cpp:483:6:void timPWM_IN_IT_CallBack(stf::TIM*, HAL_TIM_ActiveChannel)	32	static
-stf_timer.cpp:556:10:uint32_t stf::TIM::initIC(stf::TIM::TIM_IC*, uint32_t)	24	static
-stf_timer.cpp:576:6:void stf::TIM::setICPolarity(uint32_t, uint32_t)	32	static
-stf_timer.cpp:586:6:void stf::TIM::icBeginIT(uint32_t)	16	static
-stf_timer.cpp:595:6:void stf::TIM::icEndIT(uint32_t)	16	static
-stf_timer.cpp:605:10:uint32_t stf::TIM::getCapVal(uint32_t)	16	static
-stf_timer.cpp:614:6:void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef*)	24	static
-stf_timer.cpp:631:13:void timIC_IT_CallBack(stf::TIM*, HAL_TIM_ActiveChannel)	16	static
-stf_timer.cpp:644:6:void stf::TIM::initEnc()	16	static
-stf_timer.cpp:660:6:void stf::TIM::encBegin()	16	static
-stf_timer.cpp:669:6:void stf::TIM::encBegin_IT()	16	static
-stf_timer.cpp:678:6:void stf::TIM::encEnd()	16	static
-stf_timer.cpp:686:6:void stf::TIM::encEnd_IT()	16	static
-stf_timer.cpp:694:6:void stf::TIM::resetEnc()	16	static
-stf_timer.cpp:705:9:int32_t stf::TIM::getEncCNT()	16	static
-stf_timer.cpp:720:9:int32_t stf::TIM::getOverFlowPart_32bit()	16	static
-stf_timer.cpp:729:6:void timEnc_OverFlow_IT_CallBack(stf::TIM*)	16	static
-stf_timer.cpp:755:1:void __static_initialization_and_destruction_0(int, int)	16	static
-stf_timer.cpp:755:1:cpp)	8	static
-stf_timer.cpp:755:1:cpp)	8	static
+stf_timer.h:181:14:void stf::Timer::set_input_capture_polarity(tim_channel, tim_capture_edge)	16	static
+stf_timer.h:188:14:void stf::Timer::input_capture_begin(tim_channel, stf::periph_mode)	16	static
+stf_timer.h:192:14:void stf::Timer::input_capture_end(tim_channel, stf::periph_mode)	16	static
+stf_timer.h:226:14:void stf::Timer::reset_encoder()	24	static
+stf_timer.h:241:35:TIM_HandleTypeDef* stf::Timer::get_htimx()	16	static
+stf_timer.h:243:31:tim_resolution stf::Timer::get_timer_resolution()	16	static
+stf_timer.h:247:21:void stf::Timer::interrupt_safe_set_CNT(uint32_t)	16	static
+stf_timer.cpp:11:1:stf::Timer::Timer(TIM_HandleTypeDef*, uint32_t, tim_resolution)	24	static
+stf_timer.cpp:19:1:stf::Timer::~Timer()	16	static
+stf_timer.cpp:21:6:void stf::Timer::set_prescaler(uint32_t)	16	static
+stf_timer.cpp:25:10:uint32_t stf::Timer::get_prescaler()	16	static
+stf_timer.cpp:29:6:void stf::Timer::set_ARR(uint32_t)	16	static
+stf_timer.cpp:45:10:uint32_t stf::Timer::get_ARR()	16	static
+stf_timer.cpp:50:6:void stf::Timer::set_CCR(tim_channel, uint32_t)	24	static
+stf_timer.cpp:58:10:uint32_t stf::Timer::get_CCR(tim_channel)	16	static
+stf_timer.cpp:63:6:void stf::Timer::set_CNT(uint32_t)	16	static
+stf_timer.cpp:67:10:uint32_t stf::Timer::get_CNT()	16	static
+stf_timer.cpp:72:10:static uint32_t stf::Timer::channel_to_idx(tim_channel)	16	static
+stf_timer.cpp:80:13:static tim_channel stf::Timer::idx_to_channel(uint32_t)	16	static
+stf_timer.cpp:134:6:void stf::Timer::set_pwm_frequency(uint32_t, uint32_t)	32	static
+stf_timer.cpp:147:6:void stf::Timer::set_timer_frequency(uint32_t)	24	static
+stf_timer.cpp:159:6:void stf::Timer::init_input_capture(uint32_t)	16	static
+stf_timer.cpp:187:6:void stf::Timer::init_pwm_input(uint32_t, uint32_t)	40	static
+stf_timer.cpp:205:6:void stf::Timer::pwm_input_begin(tim_channel, stf::logic_level)	24	static
+stf_timer.cpp:221:6:void stf::Timer::pwm_input_end(tim_channel)	16	static
+stf_timer.cpp:226:13:void timer_pwm_input_interrupt_task(stf::Timer*, HAL_TIM_ActiveChannel)	24	static
+stf_timer.cpp:278:6:void stf::Timer::init_encoder()	24	static
+stf_timer.cpp:286:6:void stf::Timer::encoder_begin(stf::periph_mode)	16	static
+stf_timer.cpp:295:13:void timer_encoder_overflow_interrupt_task(stf::Timer*)	40	static
+stf_timer.cpp:334:6:void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef*)	24	static
+stf_timer.cpp:345:6:void call_this_inside_HAL_TIM_PeriodElaspedCallback(TIM_HandleTypeDef*)	24	static
+stf_timer.cpp:351:1:void __static_initialization_and_destruction_0(int, int)	16	static
+stf_timer.cpp:351:1:cpp)	8	static
+stf_timer.cpp:351:1:cpp)	8	static

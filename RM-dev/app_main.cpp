@@ -38,11 +38,9 @@ bool blinkLED_swicth = true;
 
 void setup(void) {
     serial << "=========================================================" << stf::endl;
-    ist8310_reset.write(Low); // low resets
-    delay(100);
-    ist8310_reset.write(High); // High sets
+    
 
-    byte_t id = imu.init();
+    byte_t id = imu.init(ist8310_reset);
     imu.measure_offset();
     serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
 

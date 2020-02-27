@@ -399,18 +399,19 @@ void MPU6500::read_compass_data(void) {
 void MPU6500::measure_offset(int iter) {
     gyro_x_offset = 0; gyro_y_offset = 0; gyro_z_offset = 0;
     accel_x_offset = 0; accel_y_offset = 0; accel_z_offset = 0;
-    //compass_x_offset = 0; compass_y_offset = 0; compass_z_offset = 0;
+    compass_x_offset = 0; compass_y_offset = 0; compass_z_offset = 0;
     for(int i = 0; i < iter; i++) {    
         read_accel_data();
         read_gyro_data();
+        read_compass_data();
         gyro_x_offset += gyro_x; gyro_y_offset += gyro_y; gyro_z_offset += gyro_z;
         accel_x_offset += accel_x; accel_y_offset += accel_y;  accel_z_offset += accel_z;
-       // compass_x_offset += compass_x; compass_y_offset += compass_y; compass_z_offset += compass_z;
+        compass_x_offset += compass_x; compass_y_offset += compass_y; compass_z_offset += compass_z;
         delay(5);
     }
     gyro_x_offset /= iter; gyro_y_offset /= iter; gyro_z_offset /= iter;
     accel_x_offset /= iter; accel_y_offset /= iter; accel_z_offset /= iter;
-    //compass_x_offset /= iter; compass_y_offset /= iter; compass_z_offset /= iter;
+    compass_x_offset /= iter; compass_y_offset /= iter; compass_z_offset /= iter;
 }
 
 void MPU6500::set_gyro_full_scale_range(GyroScale scale) {

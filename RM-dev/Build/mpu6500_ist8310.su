@@ -16,9 +16,9 @@ mpu6500_ist8310.cpp:377:6:void MPU6500::read_gyro_data()	24	static
 mpu6500_ist8310.cpp:384:6:void MPU6500::read_temp_data()	32	static
 mpu6500_ist8310.cpp:389:6:void MPU6500::read_compass_data()	24	static
 mpu6500_ist8310.cpp:399:6:void MPU6500::measure_offset(int)	24	static
-mpu6500_ist8310.cpp:416:6:void MPU6500::set_gyro_full_scale_range(MPU6500::GyroScale)	16	static
-mpu6500_ist8310.cpp:424:6:void MPU6500::set_accel_full_scale_range(MPU6500::AccelScale)	16	static
-mpu6500_ist8310.cpp:434:13:std::__cxx11::string MPU6500::data_string()	248	static
+mpu6500_ist8310.cpp:417:6:void MPU6500::set_gyro_full_scale_range(MPU6500::GyroScale)	16	static
+mpu6500_ist8310.cpp:425:6:void MPU6500::set_accel_full_scale_range(MPU6500::AccelScale)	16	static
+mpu6500_ist8310.cpp:435:13:std::__cxx11::string MPU6500::data_string()	248	static
 string_conversions.h:99:5:) [with _String = std::__cxx11::basic_string<char>; _CharT = char]	52	dynamic
 basic_string.h:5968:5:std::__cxx11::basic_string<_CharT, _Traits, _Alloc> std::operator+(const _CharT*, std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&&) [with _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]	24	static
 basic_string.h:604:9:std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::basic_string(_InputIterator, _InputIterator, const _Alloc&) [with _InputIterator = char*; <template-parameter-2-2> = void; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]	32	static
@@ -30,6 +30,6 @@ type_traits.h:152:5:bool __gnu_cxx::__is_null_pointer(_Type*) [with _Type = char
 stl_iterator_base_types.h:205:5:constexpr typename std::iterator_traits<_Iterator>::iterator_category std::__iterator_category(const _Iter&) [with _Iter = char*]	16	static
 stl_iterator_base_funcs.h:138:5:typename std::iterator_traits<_Iterator>::difference_type std::distance(_InputIterator, _InputIterator) [with _InputIterator = char*]	32	static
 stl_iterator_base_funcs.h:98:5:constexpr typename std::iterator_traits<_Iterator>::difference_type std::__distance(_RandomAccessIterator, _RandomAccessIterator, std::random_access_iterator_tag) [with _RandomAccessIterator = char*]	24	static
-mpu6500_ist8310.cpp:442:1:void __static_initialization_and_destruction_0(int, int)	16	static
-mpu6500_ist8310.cpp:442:1:cpp)	8	static
-mpu6500_ist8310.cpp:442:1:cpp)	8	static
+mpu6500_ist8310.cpp:443:1:void __static_initialization_and_destruction_0(int, int)	16	static
+mpu6500_ist8310.cpp:443:1:cpp)	8	static
+mpu6500_ist8310.cpp:443:1:cpp)	8	static

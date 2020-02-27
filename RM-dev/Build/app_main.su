@@ -8,16 +8,17 @@ dji_m2006_motor.h:38:9:DjiRM::M2006_Motor::M2006_Motor(CAN_HandleTypeDef*)	16	st
 dji_m2006_motor.h:41:9:DjiRM::M2006_Motor::~M2006_Motor()	16	static
 mpu6500_ist8310.h:70:5:MPU6500::MPU6500(stf::SPI&, stf::GPIO&)	32	static
 mpu6500_ist8310.h:77:5:MPU6500::~MPU6500()	16	static
-mpu6500_ist8310.h:85:10:void MPU6500::read_data()	16	static
+mpu6500_ist8310.h:80:12:byte_t MPU6500::init(stf::GPIO&)	16	static
+mpu6500_ist8310.h:91:10:void MPU6500::read_data()	16	static
 app_main.cpp:39:6:void setup()	16	static
-app_main.cpp:53:6:void loop0()	32	static
-app_main.cpp:104:6:void loop1()	8	static
-app_main.cpp:116:6:void exception(const char*)	56	static
+app_main.cpp:51:6:void loop0()	32	static
+app_main.cpp:102:6:void loop1()	8	static
+app_main.cpp:114:6:void exception(const char*)	56	static
 stf_usart.h:109:13:stf::USART& operator<<(stf::USART&, const T&) [with T = char [58]]	256	static
 stf_usart.h:109:13:stf::USART& operator<<(stf::USART&, const T&) [with T = std::__cxx11::basic_string<char>]	256	static
 stf_usart.h:109:13:stf::USART& operator<<(stf::USART&, const T&) [with T = char [19]]	256	static
 stf_usart.h:109:13:stf::USART& operator<<(stf::USART&, const T&) [with T = int]	256	static
 stf_usart.h:109:13:stf::USART& operator<<(stf::USART&, const T&) [with T = char [6]]	256	static
-app_main.cpp:118:1:void __static_initialization_and_destruction_0(int, int)	16	static
-app_main.cpp:118:1:cpp)	8	static
-app_main.cpp:118:1:cpp)	8	static
+app_main.cpp:116:1:void __static_initialization_and_destruction_0(int, int)	16	static
+app_main.cpp:116:1:cpp)	8	static
+app_main.cpp:116:1:cpp)	8	static
