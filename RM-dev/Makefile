@@ -125,7 +125,7 @@ $(wildcard $(STFDIR)/src/*.cpp)
 
 .DEFAULT_GOAL:=default
 default: 
-	make -j8 $(target).elf
+	make -j $(target).elf
 
 
 #Compliers
