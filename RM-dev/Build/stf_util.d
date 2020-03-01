@@ -40,7 +40,8 @@ Build/stf_util.o: stm32-thalamus/src/stf_util.cpp \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h \
- RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+ RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
+ RM-core/Drivers/CMSIS/DSP/Include/arm_math.h
 
 stm32-thalamus/inc/stf_util.h:
 
@@ -127,3 +128,5 @@ RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
 RM-core/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h:
 
 RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
+
+RM-core/Drivers/CMSIS/DSP/Include/arm_math.h:

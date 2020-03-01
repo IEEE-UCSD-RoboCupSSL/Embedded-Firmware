@@ -26,7 +26,12 @@ extern "C" {
     #include "stm32f7xx_hal.h"
 #endif
 
-    #include "cmsis_os.h"
+#include "cmsis_os.h"
+#include "arm_math.h"
+#include <cmath>
+
+
+
 }
 /*========================================================================*/
 
@@ -62,13 +67,15 @@ namespace stf {
         HAL,
         RTOS
     };
+
+    __weak void exception(const char* str);
+
+    __weak void notify(const char* str);
 }
 
 typedef uint8_t byte_t;
 
 
-
-__weak void exception(const char* str);
 
 
 #endif

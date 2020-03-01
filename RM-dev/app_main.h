@@ -4,7 +4,6 @@
 #include "stf.h"
 
 
-
 //====================================================================//
 /*Callback functions called by different thread task func in main.c*/ 
 //omit "_callback" postfix to make it less intimidating
@@ -21,6 +20,7 @@ extern "C" void loop1(void);
  * and generate new code, 
  * then call the loop# func in the loop of startTask0#  
  */
+
 //====================================================================//
 
 

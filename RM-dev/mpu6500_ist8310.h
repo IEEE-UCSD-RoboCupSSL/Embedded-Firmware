@@ -4,23 +4,8 @@
 #include "stf.h"
 
 
-/* IMU interface*/  /* this (interface)class should resides in a different file, but due to the 
-relatively smaller scale of this project and need for convenience, put it here instead to reduce # of files*/
-/*
-namespace DjiRM {
-    class IMU {
-    private:
 
-    public:
-        IMU() {
 
-        }
-        ~IMU() {
-
-        }
-    };
-}
-*/
 
 
 
@@ -34,6 +19,11 @@ private:
     bool is_hardware_chip_select; //if hardware css is enabled, no software is needed to control the css pin
     stf::SPI *spi_bus_ptr;
     stf::GPIO *chip_select_ptr;
+    byte_t id;
+    enum GyroScale {_250dps, _500dps, _1000dps, _2000dps};
+    enum AccelScale {_2g, _4g, _8g, _16g};
+
+
     void enable_chip_select(void) {if(is_hardware_chip_select == false) chip_select_ptr->write(stf::Low);}
     void disable_chip_select(void) {if(is_hardware_chip_select == false) chip_select_ptr->write(stf::High);}
     void write_reg(byte_t address, byte_t byte);
@@ -41,12 +31,8 @@ private:
     void mpu_i2c_write_reg(byte_t address, byte_t byte);
     byte_t mpu_i2c_read_reg(byte_t address);
     void mpu_master_i2c_auto_read_config(uint8_t device_address, uint8_t reg_address, uint8_t num_bytes);
+    void measure_offset(int iter = 300);
 
-    byte_t id;
-    enum GyroScale {_250dps, _500dps, _1000dps, _2000dps};
-    enum AccelScale {_2g, _4g, _8g, _16g};
-
-    
 public:
 
     int16_t gyro_x = 0, gyro_y = 0, gyro_z = 0;
@@ -76,6 +62,7 @@ public:
     }
     ~MPU6500(void) {}
 
+    // default:  Gyro scale = +-2000dps, Accel scale = +-8g 
     byte_t init(void);
     byte_t init(stf::GPIO& ist8310_reset) {
         ist8310_reset.write(stf::Low); // low resets
@@ -83,7 +70,8 @@ public:
         ist8310_reset.write(stf::High); // High sets
         return init();
     }
-    void measure_offset(int iter = 300);
+    
+    void calibrate(int iter = 300) {measure_offset(iter);}
     void read_accel_data(void);
     void read_gyro_data(void);
     void read_temp_data(void);

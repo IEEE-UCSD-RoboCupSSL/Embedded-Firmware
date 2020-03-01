@@ -62,8 +62,14 @@ void Error_Handler(void);
 #define IST8310_Reset_GPIO_Port GPIOE
 #define SPI4_CS_Pin GPIO_PIN_4
 #define SPI4_CS_GPIO_Port GPIOE
-#define Motor_Power_Switch_02_Pin GPIO_PIN_2
+#define Motor_Power_Switch_01_Pin GPIO_PIN_2
+#define Motor_Power_Switch_01_GPIO_Port GPIOH
+#define Motor_Power_Switch_02_Pin GPIO_PIN_3
 #define Motor_Power_Switch_02_GPIO_Port GPIOH
+#define Motor_Power_Switch_03_Pin GPIO_PIN_4
+#define Motor_Power_Switch_03_GPIO_Port GPIOH
+#define Motor_Power_Switch_04_Pin GPIO_PIN_5
+#define Motor_Power_Switch_04_GPIO_Port GPIOH
 #define SPI5_CS_Pin GPIO_PIN_6
 #define SPI5_CS_GPIO_Port GPIOF
 #define Button_Pin GPIO_PIN_2

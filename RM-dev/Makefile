@@ -96,6 +96,7 @@ BUILD = Build
 ### macros (#define) (append user defines here)
 macros = $(DEFAULT_DEFINES) 
 
+
 ### Run time Library standards (Standard Lib(space-consuming!!!): nosys.specs, Nano Lib: nano.specs)
 ### Note: nano library doesn't support standard printing of float type
 rtlib_std = -specs=nosys.specs
@@ -111,8 +112,22 @@ compiler_path =
 
 ### User-defined sources & headers (for c or asm sources, use c_src+=<loc>/*.c)
 STFDIR = stm32-thalamus
+
+# include DSP library which has arm_math.h | arm_math.c
+#   arm math lib is too large to include all at once, 
+#   please include only the necessary ones below,
+#   or else it will take a long time to compile for the first time
+macros += -DARM_MATH_CM4 -D__TARGET_FPU_VFP -D__FPU_PRESENT=1
+c_inc += -I$(FDIR)/Drivers/CMSIS/DSP/Include
+c_src += $(wildcard $(FDIR)/Drivers/CMSIS/DSP/Source/BasicMathFunctions/*.c) \
+$(wildcard $(FDIR)/Drivers/CMSIS/DSP/Source/MatrixFunctions/*.c) \
+$(wildcard $(FDIR)/Drivers/CMSIS/DSP/Source/FastMathFunctions/*.c) \
+$(wildcard $(FDIR)/Drivers/CMSIS/DSP/Source/CommonTables/*.c)
+
+
 cpp_inc = $(c_inc) \
 -I$(STFDIR)/inc 
+
 
 cpp_src = \
 $(wildcard *.cpp) \

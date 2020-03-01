@@ -47,8 +47,8 @@ namespace DjiRM {
         void set_current(int16_t ESC1_Curr, int16_t ESC2_Curr, int16_t ESC3_Curr, int16_t ESC4_Curr);
 
         uint16_t get_raw_angle(motor_id m_id);
-        uint16_t get_raw_speed(motor_id m_id);
-        uint16_t get_raw_torque(motor_id m_id);
+        int16_t get_raw_speed(motor_id m_id);
+        int16_t get_raw_torque(motor_id m_id);
         
 
         void motor_test(void);

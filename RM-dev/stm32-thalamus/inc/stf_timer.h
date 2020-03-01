@@ -255,7 +255,8 @@ extern "C" void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htimx);
 
 __weak void timer_period_elasped_interrupt_task(stf::Timer *instance);
 // weak def of period elasped callback is already overwritten in main.c by freeRTOS
-void call_this_inside_HAL_TIM_PeriodElaspedCallback(TIM_HandleTypeDef *htimx);
+extern "C" void call_this_inside_HAL_TIM_PeriodElaspedCallback(TIM_HandleTypeDef *htimx);
+
 
 #endif
 #endif

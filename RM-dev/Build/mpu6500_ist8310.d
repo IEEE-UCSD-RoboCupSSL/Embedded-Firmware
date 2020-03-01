@@ -42,6 +42,7 @@ Build/mpu6500_ist8310.o: mpu6500_ist8310.cpp mpu6500_ist8310.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
+ RM-core/Drivers/CMSIS/DSP/Include/arm_math.h \
  stm32-thalamus/inc/stf_systick.h stm32-thalamus/inc/stf_usart.h \
  stm32-thalamus/inc/stf_i2c.h stm32-thalamus/inc/stf_spi.h \
  stm32-thalamus/inc/stf_util.h stm32-thalamus/inc/stf_timer.h \
@@ -136,6 +137,8 @@ RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
 RM-core/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h:
 
 RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
+
+RM-core/Drivers/CMSIS/DSP/Include/arm_math.h:
 
 stm32-thalamus/inc/stf_systick.h:
 

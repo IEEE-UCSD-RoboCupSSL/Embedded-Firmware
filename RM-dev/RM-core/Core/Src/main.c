@@ -429,7 +429,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(IST8310_Reset_GPIO_Port, IST8310_Reset_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(Motor_Power_Switch_02_GPIO_Port, Motor_Power_Switch_02_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOH, Motor_Power_Switch_01_Pin|Motor_Power_Switch_02_Pin|Motor_Power_Switch_03_Pin|Motor_Power_Switch_04_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(SPI5_CS_GPIO_Port, SPI5_CS_Pin, GPIO_PIN_SET);
@@ -453,12 +453,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(SPI4_CS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : Motor_Power_Switch_02_Pin */
-  GPIO_InitStruct.Pin = Motor_Power_Switch_02_Pin;
+  /*Configure GPIO pins : Motor_Power_Switch_01_Pin Motor_Power_Switch_02_Pin Motor_Power_Switch_03_Pin Motor_Power_Switch_04_Pin */
+  GPIO_InitStruct.Pin = Motor_Power_Switch_01_Pin|Motor_Power_Switch_02_Pin|Motor_Power_Switch_03_Pin|Motor_Power_Switch_04_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(Motor_Power_Switch_02_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
   /*Configure GPIO pin : SPI5_CS_Pin */
   GPIO_InitStruct.Pin = SPI5_CS_Pin;
@@ -536,7 +536,7 @@ void StartTask02(void *argument)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
-
+  call_this_inside_HAL_TIM_PeriodElaspedCallback(htim);
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM12) {
     HAL_IncTick();

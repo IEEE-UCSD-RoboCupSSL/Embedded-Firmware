@@ -2,6 +2,7 @@
 #include "dji_m2006_motor.h"
 #include "mpu6500_ist8310.h"
 
+
 #include <iostream>
 #include <vector>
 #include <sstream>
@@ -14,7 +15,10 @@ using namespace std;
 GPIO green_led(Green_LED_GPIO_Port, Green_LED_Pin);
 GPIO red_led(Red_LED_GPIO_Port, Red_LED_Pin);
 GPIO button(Button_GPIO_Port, Button_Pin);
+GPIO motor_power_switch_01(Motor_Power_Switch_01_GPIO_Port, Motor_Power_Switch_01_Pin);
 GPIO motor_power_switch_02(Motor_Power_Switch_02_GPIO_Port, Motor_Power_Switch_02_Pin);
+GPIO motor_power_switch_03(Motor_Power_Switch_03_GPIO_Port, Motor_Power_Switch_03_Pin);
+GPIO motor_power_switch_04(Motor_Power_Switch_04_GPIO_Port, Motor_Power_Switch_04_Pin);
 
 extern UART_HandleTypeDef huart2;
 USART serial(&huart2);
@@ -36,24 +40,54 @@ GPIO ist8310_reset(IST8310_Reset_GPIO_Port, IST8310_Reset_Pin);
 
 bool blinkLED_swicth = true;
 
+void util_test(void) {
+    serial << "=============" << stf::endl;
+    serial << cos(degree_to_radian(60.0)) << " " << fast_cos(dtr(60.0)) << stf::endl;
+    serial << fast_inv_sqrt(2.0) << stf::endl;
+    serial << abs(-5.5) << stf::endl;
+    serial << map(50.2, from_range(0, 100), to_range(50, 100)) << stf::endl;
+}
+
 void setup(void) {
+    
+    util_test(); while(1);
+    
+    blinkLED_swicth = false;
     serial << "=========================================================" << stf::endl;
     
+    motor_power_switch_01.write(High);
+    motor_power_switch_02.write(High);
+    motor_power_switch_03.write(High);
+    motor_power_switch_04.write(High);
 
     byte_t id = imu.init(ist8310_reset);
-    imu.measure_offset();
     serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
 
-  
-    //motor_power_switch_02.write(High);
+/*
+    serial << ">";
+    string start_str = serial.readWord();
+    serial << start_str << stf::endl;
+    while(start_str != "start") {
+        serial << ">";
+        start_str = serial.readWord();
+        serial << start_str << stf::endl;
+    }
+    */
+    blinkLED_swicth = true;
+
 }
 
 void loop0(void) {
-    //motors.init();
+    motors.init();
     //while(button.read() == Low);
-    blinkLED_swicth = false;
     
-    
+    //motors.motor_test();
+    motors.set_current(10000,10000,-10000,-10000);
+    delay(250);
+    motors.set_current(0,0,0,0);
+
+    while(1);
+    /*
     while(1) {
         imu.read_data();
         
@@ -62,6 +96,7 @@ void loop0(void) {
         
         delay(500);
     }
+    */
 
 /*
     ras_spi.set_txrx_timeout(1000000);
@@ -111,6 +146,6 @@ void loop1(void) {
    }
 }
 
-void exception(const char* str) {
+void stf::exception(const char* str) {
     serial << stf::endl << "*****" << string(str) << stf::endl;
 }

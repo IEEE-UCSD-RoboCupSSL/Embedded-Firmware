@@ -41,6 +41,7 @@ Build/stf_i2c.o: stm32-thalamus/src/stf_i2c.cpp \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h \
  RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
+ RM-core/Drivers/CMSIS/DSP/Include/arm_math.h \
  stm32-thalamus/inc/stf_systick.h
 
 stm32-thalamus/inc/stf_i2c.h:
@@ -128,5 +129,7 @@ RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
 RM-core/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h:
 
 RM-core/Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
+
+RM-core/Drivers/CMSIS/DSP/Include/arm_math.h:
 
 stm32-thalamus/inc/stf_systick.h:

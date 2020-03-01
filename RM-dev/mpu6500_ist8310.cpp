@@ -363,6 +363,7 @@ byte_t MPU6500::init(void) {
     mpu_master_i2c_auto_read_config(IST8310_ADDRESS, IST8310_R_XL, 0x06);
     delay(10);
 
+    measure_offset();
 
     return id;
 }

@@ -1,11 +1,11 @@
 gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
-dji_m2006_motor.cpp:21:6:void DjiRM::M2006_Motor::init()	16	static
-dji_m2006_motor.cpp:45:6:void DjiRM::M2006_Motor::set_current(int16_t, int16_t, int16_t, int16_t)	24	static
-dji_m2006_motor.cpp:71:6:void DjiRM::M2006_Motor::motor_test()	48	static
-dji_m2006_motor.cpp:104:6:void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef*)	56	static
-dji_m2006_motor.cpp:123:10:uint16_t DjiRM::M2006_Motor::get_raw_angle(DjiRM::motor_id)	16	static
-dji_m2006_motor.cpp:126:10:uint16_t DjiRM::M2006_Motor::get_raw_speed(DjiRM::motor_id)	16	static
-dji_m2006_motor.cpp:129:10:uint16_t DjiRM::M2006_Motor::get_raw_torque(DjiRM::motor_id)	16	static
-dji_m2006_motor.cpp:131:1:void __static_initialization_and_destruction_0(int, int)	16	static
-dji_m2006_motor.cpp:131:1:cpp)	8	static
-dji_m2006_motor.cpp:131:1:cpp)	8	static
+dji_m2006_motor.cpp:27:6:void DjiRM::M2006_Motor::init()	16	static
+dji_m2006_motor.cpp:51:6:void DjiRM::M2006_Motor::set_current(int16_t, int16_t, int16_t, int16_t)	24	static
+dji_m2006_motor.cpp:83:6:void DjiRM::M2006_Motor::motor_test()	48	static
+dji_m2006_motor.cpp:125:6:void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef*)	56	static
+dji_m2006_motor.cpp:144:10:uint16_t DjiRM::M2006_Motor::get_raw_angle(DjiRM::motor_id)	16	static
+dji_m2006_motor.cpp:147:9:int16_t DjiRM::M2006_Motor::get_raw_speed(DjiRM::motor_id)	16	static
+dji_m2006_motor.cpp:150:9:int16_t DjiRM::M2006_Motor::get_raw_torque(DjiRM::motor_id)	16	static
+dji_m2006_motor.cpp:152:1:void __static_initialization_and_destruction_0(int, int)	16	static
+dji_m2006_motor.cpp:152:1:cpp)	8	static
+dji_m2006_motor.cpp:152:1:cpp)	8	static
