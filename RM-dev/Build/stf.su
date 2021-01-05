@@ -1,8 +1,0 @@
-gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
-stf.cpp:18:7:void* operator new(size_t)	24	static
-stf.cpp:25:7:void* operator new [](size_t)	24	static
-stf.cpp:32:6:void operator delete(void*)	16	static
-stf.cpp:38:6:void operator delete [](void*)	16	static
-stf.cpp:42:1:void __static_initialization_and_destruction_0(int, int)	16	static
-stf.cpp:42:1:cpp)	8	static
-stf.cpp:42:1:cpp)	8	static
