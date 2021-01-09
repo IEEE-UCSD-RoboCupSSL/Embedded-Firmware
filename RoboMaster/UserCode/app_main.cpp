@@ -82,7 +82,7 @@ void loop0(void) {
     //For safety reasons
     //Refers to white button, the programmable one
      while(button.read() == Low){
-    	 motors.set_current(0,0,0,0);
+    	 motors.stop();
      }
     
     //motors.motor_test();

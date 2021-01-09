@@ -88,6 +88,10 @@ void M2006_Motor::set_current(int16_t ESC1_Curr, int16_t ESC2_Curr, int16_t ESC3
     HAL_CAN_AddTxMessage(hcanx, &tx_header, tx_data, &tx_mailbox);
 }
 
+void M2006_Motor::stop(void){
+	this->set_current(0,0,0,0);
+}
+
 void M2006_Motor::motor_test(void) {
     int increment_T = 3; // 3 milliseconds delay for every current increment
     int16_t current_increment = 10; // 0.1A increment
