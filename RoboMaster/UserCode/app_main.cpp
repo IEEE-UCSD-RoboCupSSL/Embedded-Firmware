@@ -55,12 +55,12 @@ void setup(void) {
     blinkLED_switch = false;
 //    serial << "=========================================================" << stf::endl;
     
-//    motor_power_switch_01.write(High);
-//    motor_power_switch_02.write(High);
-//    motor_power_switch_03.write(High);
-//    motor_power_switch_04.write(High);
+    motor_power_switch_01.write(High);
+    motor_power_switch_02.write(High);
+    motor_power_switch_03.write(High);
+    motor_power_switch_04.write(High);
 
-    byte_t id = imu.init(ist8310_reset);
+    // byte_t id = imu.init(ist8310_reset);
 //    serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
 
 /*
@@ -78,17 +78,24 @@ void setup(void) {
 }
 
 void loop0(void) {
-    //motors.init();
-    //while(button.read() == Low);
+    motors.init();
+    //For safety reasons
+    //Refers to white button, the programmable one
+     while(button.read() == Low){
+    	 motors.set_current(0,0,0,0);
+     }
     
     //motors.motor_test();
-//    motors.set_current(10000,10000,-10000,-10000);
-//    delay(250);
-//    motors.set_current(0,0,0,0);
-	while (true) {
-		serial << "Test RoboMaster" << stf::endl;
-		delay(100);
-	}
+    while (true){
+    	motors.set_current(5000, 5000, 5000, 5000);
+    }
+//	while (true) {
+////		motors.set_current(10000,10000,-10000,-10000);
+////		delay(500);
+////		motors.set_current(0,0,0,0);
+//		serial << "Test RoboMaster" << stf::endl;
+//		delay(100);
+//	}
 
 
     while(1);

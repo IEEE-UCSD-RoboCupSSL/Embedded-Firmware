@@ -27,6 +27,14 @@ static volatile int16_t torque_data[4];
 void M2006_Motor::init(void) {
     __hcanx = hcanx;
 
+    //Overwrite automatic settings
+    hcanx->Init.Prescaler = 3;
+    hcanx->Init.TimeSeg2 = CAN_BS2_4TQ; //Assign special, longer 4
+    //Apply settings
+    if (HAL_CAN_Init(hcanx) != HAL_OK)
+	{
+    	Error_Handler();
+	}
     // Configure CAN filter
     filter_config.FilterBank = 0;
     filter_config.FilterMode = CAN_FILTERMODE_IDMASK;
