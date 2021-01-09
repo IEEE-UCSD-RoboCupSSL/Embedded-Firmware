@@ -20,6 +20,8 @@ GPIO motor_power_switch_02(Motor_Power_Switch_02_GPIO_Port, Motor_Power_Switch_0
 GPIO motor_power_switch_03(Motor_Power_Switch_03_GPIO_Port, Motor_Power_Switch_03_Pin);
 GPIO motor_power_switch_04(Motor_Power_Switch_04_GPIO_Port, Motor_Power_Switch_04_Pin);
 
+uint16_t angle, speed, torque;
+
 extern UART_HandleTypeDef huart2;
 USART serial(&huart2);
 
@@ -79,8 +81,8 @@ void setup(void) {
 
 void loop0(void) {
     motors.init();
-    //For safety reasons
-    //Refers to white button, the programmable one
+
+    // Program white button for safety reasons
      while(button.read() == Low){
     	 motors.stop();
      }
@@ -88,6 +90,13 @@ void loop0(void) {
     //motors.motor_test();
     while (true){
     	motors.set_current(5000, 5000, 5000, 5000);
+    	// serial << "Motor on" << stf::endl;
+        angle = motors.get_raw_angle(DjiRM::Motor2);
+        speed = motors.get_raw_speed(DjiRM::Motor2);
+        torque = motors.get_raw_torque(DjiRM::Motor2);
+        serial << "[Angle : " << angle  << "]";
+        serial << "[Speed : " << speed  << "]";
+        serial << "[Torque: " << torque << "]" << stf::endl;
     }
 //	while (true) {
 ////		motors.set_current(10000,10000,-10000,-10000);
