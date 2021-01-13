@@ -20,7 +20,8 @@ GPIO motor_power_switch_02(Motor_Power_Switch_02_GPIO_Port, Motor_Power_Switch_0
 GPIO motor_power_switch_03(Motor_Power_Switch_03_GPIO_Port, Motor_Power_Switch_03_Pin);
 GPIO motor_power_switch_04(Motor_Power_Switch_04_GPIO_Port, Motor_Power_Switch_04_Pin);
 
-uint16_t angle, speed, torque;
+int16_t speed, torque;
+uint16_t angle;
 
 extern UART_HandleTypeDef huart2;
 USART serial(&huart2);
@@ -89,7 +90,7 @@ void loop0(void) {
     
     //motors.motor_test();
     while (true){
-    	motors.set_current(5000, 5000, 5000, 5000);
+    	motors.set_current(10000, 10000, 10000, 10000);
     	// serial << "Motor on" << stf::endl;
         angle = motors.get_raw_angle(DjiRM::Motor2);
         speed = motors.get_raw_speed(DjiRM::Motor2);
