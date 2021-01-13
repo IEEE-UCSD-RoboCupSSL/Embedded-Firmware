@@ -75,26 +75,25 @@ void setup(void) {
 
 void defaultLoop(void) {
 
-	serial << motors.test_var << stf::endl;
 
-//    motors.init();
-//
-//    // Program white button for safety reasons
-//     while(button.read() == Low){
-//    	 motors.stop();
-//     }
-//
-//    //motors.motor_test();
-//    while (true){
-//    	motors.set_current(10000, 10000, 10000, 10000);
-//    	// serial << "Motor on" << stf::endl;
-//        angle = motors.get_raw_angle(DjiRM::Motor2);
-//        speed = motors.get_raw_speed(DjiRM::Motor2);
-//        torque = motors.get_raw_torque(DjiRM::Motor2);
-//        serial << "[Angle : " << angle  << "]";
-//        serial << "[Speed : " << speed  << "]";
-//        serial << "[Torque: " << torque << "]" << stf::endl;
-//    }
+    motors.init();
+
+    // Program white button for safety reasons
+     while(button.read() == Low){
+    	 motors.stop();
+     }
+
+    //motors.motor_test();
+    while (true){
+    	motors.set_current(10000, 10000, 10000, 10000);
+    	// serial << "Motor on" << stf::endl;
+        angle = motors.get_raw_angle(DjiRM::Motor2);
+        speed = motors.get_raw_speed(DjiRM::Motor2);
+        torque = motors.get_raw_torque(DjiRM::Motor2);
+        serial << "[Angle : " << angle  << "]";
+        serial << "[Speed : " << speed  << "]";
+        serial << "[Torque: " << torque << "]" << stf::endl;
+    }
 //	while (true) {
 ////		motors.set_current(10000,10000,-10000,-10000);
 ////		delay(500);
@@ -153,7 +152,7 @@ void blinkLEDLoop(void) {
 
 void updatePIDLoop(void) {
 	motors.test_update();
-	delay(20);
+	delay(1000);
 }
 
 void stf::exception(const char* str) {
