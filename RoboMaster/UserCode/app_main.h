@@ -12,9 +12,11 @@
 extern "C" void setup(void);
 
 // user may modify it to accept params if needed, 
-extern "C" void loop0(void);
+extern "C" void defaultLoop(void);
 
-extern "C" void loop1(void);
+extern "C" void blinkLEDLoop(void);
+
+extern "C" void updatePIDLoop(void);
 
 /* For task2 ... task 3...  configure their settings in cubemx GUI 
  * and generate new code, 

@@ -56,19 +56,31 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 3000 * 4
+  .stack_size = 1024 * 4
 };
-/* Definitions for myTask02 */
-osThreadId_t myTask02Handle;
-uint32_t myTask02Buffer[ 1024 ];
+/* Definitions for blinkLEDTask */
+osThreadId_t blinkLEDTaskHandle;
+uint32_t myTask02Buffer[ 128 ];
 osStaticThreadDef_t myTask02ControlBlock;
-const osThreadAttr_t myTask02_attributes = {
-  .name = "myTask02",
+const osThreadAttr_t blinkLEDTask_attributes = {
+  .name = "blinkLEDTask",
   .stack_mem = &myTask02Buffer[0],
   .stack_size = sizeof(myTask02Buffer),
   .cb_mem = &myTask02ControlBlock,
   .cb_size = sizeof(myTask02ControlBlock),
   .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for UpdatePIDTask */
+osThreadId_t UpdatePIDTaskHandle;
+uint32_t myTask03Buffer[ 256 ];
+osStaticThreadDef_t myTask03ControlBlock;
+const osThreadAttr_t UpdatePIDTask_attributes = {
+  .name = "UpdatePIDTask",
+  .stack_mem = &myTask03Buffer[0],
+  .stack_size = sizeof(myTask03Buffer),
+  .cb_mem = &myTask03ControlBlock,
+  .cb_size = sizeof(myTask03ControlBlock),
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* USER CODE BEGIN PV */
 
@@ -83,12 +95,14 @@ static void MX_SPI4_Init(void);
 static void MX_SPI5_Init(void);
 static void MX_I2C2_Init(void);
 void StartDefaultTask(void *argument);
-void StartTask02(void *argument);
+void StartBlinkLEDTask(void *argument);
+void StartUpdatePIDTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 extern void setup();
-extern void loop0();
-extern void loop1();
+extern void defaultLoop();
+extern void blinkLEDLoop();
+extern void updatePIDLoop();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -156,8 +170,11 @@ int main(void)
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* creation of myTask02 */
-  myTask02Handle = osThreadNew(StartTask02, NULL, &myTask02_attributes);
+  /* creation of blinkLEDTask */
+  blinkLEDTaskHandle = osThreadNew(StartBlinkLEDTask, NULL, &blinkLEDTask_attributes);
+
+  /* creation of UpdatePIDTask */
+  UpdatePIDTaskHandle = osThreadNew(StartUpdatePIDTask, NULL, &UpdatePIDTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -494,29 +511,48 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	loop0();
-    osDelay(1);
+	  defaultLoop();
+	  osDelay(1);
   }
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_StartTask02 */
+/* USER CODE BEGIN Header_StartBlinkLEDTask */
 /**
-* @brief Function implementing the myTask02 thread.
+* @brief Function implementing the blinkLEDTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTask02 */
-void StartTask02(void *argument)
+/* USER CODE END Header_StartBlinkLEDTask */
+void StartBlinkLEDTask(void *argument)
 {
-  /* USER CODE BEGIN StartTask02 */
+  /* USER CODE BEGIN StartBlinkLEDTask */
   /* Infinite loop */
   for(;;)
   {
-    loop1();
-    osDelay(1);
+	  blinkLEDLoop();
+	  osDelay(1);
   }
-  /* USER CODE END StartTask02 */
+  /* USER CODE END StartBlinkLEDTask */
+}
+
+/* USER CODE BEGIN Header_StartUpdatePIDTask */
+/**
+* @brief Function implementing the UpdatePIDTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartUpdatePIDTask */
+void StartUpdatePIDTask(void *argument)
+{
+  /* USER CODE BEGIN StartUpdatePIDTask */
+  /* Infinite loop */
+  for(;;)
+  {
+	  updatePIDLoop();
+	  osDelay(1);
+  }
+  /* USER CODE END StartUpdatePIDTask */
 }
 
  /**

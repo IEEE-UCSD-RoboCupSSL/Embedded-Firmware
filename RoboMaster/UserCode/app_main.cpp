@@ -43,13 +43,6 @@ GPIO ist8310_reset(IST8310_Reset_GPIO_Port, IST8310_Reset_Pin);
 
 bool blinkLED_switch = true;
 
-//void util_test(void) {
-//    serial << "=============" << stf::endl;
-//    serial << cos(degree_to_radian(60.0)) << " " << fast_cos(dtr(60.0)) << stf::endl;
-//    serial << fast_inv_sqrt(2.0) << stf::endl;
-//    serial << abs(-5.5) << stf::endl;
-//    serial << map(50.2, from_range(0, 100), to_range(50, 100)) << stf::endl;
-//}
 
 void setup(void) {
     
@@ -80,25 +73,28 @@ void setup(void) {
 
 }
 
-void loop0(void) {
-    motors.init();
+void defaultLoop(void) {
 
-    // Program white button for safety reasons
-     while(button.read() == Low){
-    	 motors.stop();
-     }
-    
-    //motors.motor_test();
-    while (true){
-    	motors.set_current(10000, 10000, 10000, 10000);
-    	// serial << "Motor on" << stf::endl;
-        angle = motors.get_raw_angle(DjiRM::Motor2);
-        speed = motors.get_raw_speed(DjiRM::Motor2);
-        torque = motors.get_raw_torque(DjiRM::Motor2);
-        serial << "[Angle : " << angle  << "]";
-        serial << "[Speed : " << speed  << "]";
-        serial << "[Torque: " << torque << "]" << stf::endl;
-    }
+	serial << motors.test_var << stf::endl;
+
+//    motors.init();
+//
+//    // Program white button for safety reasons
+//     while(button.read() == Low){
+//    	 motors.stop();
+//     }
+//
+//    //motors.motor_test();
+//    while (true){
+//    	motors.set_current(10000, 10000, 10000, 10000);
+//    	// serial << "Motor on" << stf::endl;
+//        angle = motors.get_raw_angle(DjiRM::Motor2);
+//        speed = motors.get_raw_speed(DjiRM::Motor2);
+//        torque = motors.get_raw_torque(DjiRM::Motor2);
+//        serial << "[Angle : " << angle  << "]";
+//        serial << "[Speed : " << speed  << "]";
+//        serial << "[Torque: " << torque << "]" << stf::endl;
+//    }
 //	while (true) {
 ////		motors.set_current(10000,10000,-10000,-10000);
 ////		delay(500);
@@ -139,24 +135,11 @@ void loop0(void) {
 */
 
 
-    /*
-    uint16_t angle, speed, torque;
-
-    while(1) {
-        motors.set_current(1000, 0, 0, 0);
-        angle = motors.get_raw_angle(DjiRM::Motor1);
-        speed = motors.get_raw_speed(DjiRM::Motor1);
-        torque = motors.get_raw_torque(DjiRM::Motor1);
-        serial << "[Angle : " << angle  << "]";
-        serial << "[Speed : " << speed  << "]";
-        serial << "[Torque: " << torque << "]" << stf::endl;
-    }
-    */
 }
 
 
 
-void loop1(void) {
+void blinkLEDLoop(void) {
     
     while (blinkLED_switch == true) {
        delay(300);
@@ -166,6 +149,11 @@ void loop1(void) {
        green_led.write(Low);
        red_led.write(High);
    }
+}
+
+void updatePIDLoop(void) {
+	motors.test_update();
+	delay(20);
 }
 
 void stf::exception(const char* str) {

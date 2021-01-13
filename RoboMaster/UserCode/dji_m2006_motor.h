@@ -55,6 +55,13 @@ namespace DjiRM {
 
         void motor_test(void);
 
+
+        bool test_var = false;
+        void test_update(void) {
+        	if(test_var == false) test_var = true;
+        	else test_var = false;
+        }
+
     };
 }
 
