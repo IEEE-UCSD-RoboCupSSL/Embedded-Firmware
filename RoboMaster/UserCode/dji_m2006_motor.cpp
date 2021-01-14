@@ -6,7 +6,7 @@
 
 using namespace DjiRM;
 
-static const int16_t max_current = 9900; // 9.9A
+static const int16_t max_current = 9999; // 9.999A
 
 
 /* These should be declared as memeber variables in OOP design,
@@ -23,6 +23,10 @@ static volatile uint8_t motor_idx;
 static volatile uint16_t angle_data[4];
 static volatile int16_t speed_data[4];
 static volatile int16_t torque_data[4];
+
+
+
+
 
 void M2006_Motor::init(void) {
     __hcanx = hcanx;
@@ -54,6 +58,10 @@ void M2006_Motor::init(void) {
     // Activate CAN receive interrupt for encoder data
     HAL_CAN_ActivateNotification(hcanx, CAN_IT_RX_FIFO0_MSG_PENDING);
 
+	m1_ctrl.init(pid_ctrl_freq_Hz);
+	m2_ctrl.init(pid_ctrl_freq_Hz);
+	m3_ctrl.init(pid_ctrl_freq_Hz);
+	m4_ctrl.init(pid_ctrl_freq_Hz);
 }
 
 void M2006_Motor::set_current(int16_t ESC1_Curr, int16_t ESC2_Curr, int16_t ESC3_Curr, int16_t ESC4_Curr) {
@@ -88,9 +96,96 @@ void M2006_Motor::set_current(int16_t ESC1_Curr, int16_t ESC2_Curr, int16_t ESC3
     HAL_CAN_AddTxMessage(hcanx, &tx_header, tx_data, &tx_mailbox);
 }
 
-void M2006_Motor::stop(void){
-	this->set_current(0,0,0,0);
+
+/* Read encoder in FMP0 interrupt that triggers 
+ * everytime a new message arrived through CAN
+ */
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
+
+    if(hcan == __hcanx) {
+        uint8_t rx_data[8];
+        CAN_RxHeaderTypeDef rx_header;
+        HAL_CAN_GetRxMessage(__hcanx, CAN_RX_FIFO0, &rx_header, rx_data);
+
+        if(rx_header.StdId == motor1_can_id) motor_idx = 0;
+        if(rx_header.StdId == motor2_can_id) motor_idx = 1;
+        if(rx_header.StdId == motor3_can_id) motor_idx = 2;
+        if(rx_header.StdId == motor4_can_id) motor_idx = 3;
+
+        angle_data[motor_idx] = (uint16_t)(rx_data[0]<<8 | rx_data[1]);
+        speed_data[motor_idx] = (int16_t)(rx_data[2]<<8 | rx_data[3]);
+        torque_data[motor_idx] = (int16_t)(rx_data[4]<<8 | rx_data[5]);
+    }
 }
+
+
+uint16_t M2006_Motor::get_raw_angle(motor_id m_id) {
+    return angle_data[m_id];
+}
+int16_t M2006_Motor::get_raw_speed(motor_id m_id) {
+    return speed_data[m_id];
+}
+int16_t M2006_Motor::get_raw_torque(motor_id m_id) {
+    return torque_data[m_id];
+}
+
+float M2006_Motor::get_velocity(motor_id m_id) {
+	if(get_raw_torque(m_id) > 0) {
+		return stf::map((float)get_raw_speed(m_id),
+				   from_range((float)0.00, (float)max_raw_speed),
+				   to_range((float)0.00, (float)100.00));
+	}
+	else {
+		return -stf::map((float)get_raw_speed(m_id),
+				   from_range((float)0.00, (float)max_raw_speed),
+				   to_range((float)0.00, (float)100.00));
+	}
+}
+
+
+
+void M2006_Motor::update_pid_consts(float Kp, float Ki, float Kd) {
+	m1_ctrl.update_pid_consts(Kp, Ki, Kd);
+	m2_ctrl.update_pid_consts(Kp, Ki, Kd);
+	m3_ctrl.update_pid_consts(Kp, Ki, Kd);
+	m4_ctrl.update_pid_consts(Kp, Ki, Kd);
+}
+
+uint32_t M2006_Motor::get_ctrl_period_ms(void) {
+	return (uint32_t)((1.00 / (float)pid_ctrl_freq_Hz) * 1000.00);
+}
+
+void M2006_Motor::pid_update_motor_currents(void) {
+	float new_curr1, new_curr2, new_curr3, new_curr4;
+	new_curr1 = m1_ctrl.calculate(m1_vel, get_velocity(Motor1));
+	new_curr2 = m1_ctrl.calculate(m2_vel, get_velocity(Motor2));
+	new_curr3 = m1_ctrl.calculate(m3_vel, get_velocity(Motor3));
+	new_curr4 = m1_ctrl.calculate(m4_vel, get_velocity(Motor4));
+
+	new_curr1 = stf::map(new_curr1, from_range(-100.00f, 100.00f),
+									to_range(-(float)max_current, (float)max_current));
+	new_curr2 = stf::map(new_curr2, from_range(-100.00f, 100.00f),
+									to_range(-(float)max_current, (float)max_current));
+	new_curr3 = stf::map(new_curr3, from_range(-100.00f, 100.00f),
+									to_range(-(float)max_current, (float)max_current));
+	new_curr4 = stf::map(new_curr4, from_range(-100.00f, 100.00f),
+									to_range(-(float)max_current, (float)max_current));
+	set_current((int16_t)new_curr1, (int16_t)new_curr2, (int16_t)new_curr3, (int16_t)new_curr4);
+}
+
+// vel range: -100.00 ~ 100.00, where 100.00 means 100% of max possible velocity
+void M2006_Motor::set_velocity(float m1_vel, float m2_vel, float m3_vel, float m4_vel) {
+	this->m1_vel = m1_vel;
+	this->m2_vel = m2_vel;
+	this->m3_vel = m3_vel;
+	this->m4_vel = m4_vel;
+}
+
+void M2006_Motor::stop(void){
+	set_velocity(0.00, 0.00, 0.00, 0.00);
+}
+
+
 
 void M2006_Motor::motor_test(void) {
     int increment_T = 3; // 3 milliseconds delay for every current increment
@@ -131,34 +226,39 @@ void M2006_Motor::motor_test(void) {
 }
 
 
-/* Read encoder in FMP0 interrupt that triggers 
- * everytime a new message arrived through CAN
- */
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
+void M2006_Motor::motor_test(motor_id m_id) {
+    int increment_T = 3; // 3 milliseconds delay for every current increment
+    int16_t current_increment = 10; // 0.1A increment
 
-    if(hcan == __hcanx) {
-        uint8_t rx_data[8];
-        CAN_RxHeaderTypeDef rx_header;
-        HAL_CAN_GetRxMessage(__hcanx, CAN_RX_FIFO0, &rx_header, rx_data);
-
-        if(rx_header.StdId == motor1_can_id) motor_idx = 0;
-        if(rx_header.StdId == motor2_can_id) motor_idx = 1;
-        if(rx_header.StdId == motor3_can_id) motor_idx = 2;
-        if(rx_header.StdId == motor4_can_id) motor_idx = 3;
-
-        angle_data[motor_idx] = (uint16_t)(rx_data[0]<<8 | rx_data[1]);
-        speed_data[motor_idx] = (int16_t)(rx_data[2]<<8 | rx_data[3]);
-        torque_data[motor_idx] = (int16_t)(rx_data[4]<<8 | rx_data[5]);
-    }
+	stf::notify("led: all on");
+	stf::delay(300);
+	stf::notify("led: all off");
+	for(int16_t curr = 0; curr < max_current; curr += current_increment) {
+		if(m_id == Motor1) set_current(curr, 0, 0, 0);
+		if(m_id == Motor2) set_current(0, curr, 0, 0);
+		if(m_id == Motor3) set_current(0, 0, curr, 0);
+		if(m_id == Motor4) set_current(0, 0, 0, curr);
+		stf::delay(increment_T);
+	}
+	stf::notify("led: green on");
+	stf::delay(300);
+	stf::notify("led: green off");
+	for(int16_t curr = max_current; curr > -max_current; curr -= current_increment) {
+		if(m_id == Motor1) set_current(curr, 0, 0, 0);
+		if(m_id == Motor2) set_current(0, curr, 0, 0);
+		if(m_id == Motor3) set_current(0, 0, curr, 0);
+		if(m_id == Motor4) set_current(0, 0, 0, curr);
+		stf::delay(increment_T);
+	}
+	stf::notify("led: red on");
+	stf::delay(300);
+	stf::notify("led: red off");
+	for(int16_t curr = -max_current; curr < 0; curr += current_increment) {
+		if(m_id == Motor1) set_current(curr, 0, 0, 0);
+		if(m_id == Motor2) set_current(0, curr, 0, 0);
+		if(m_id == Motor3) set_current(0, 0, curr, 0);
+		if(m_id == Motor4) set_current(0, 0, 0, curr);
+		stf::delay(increment_T);
+	}
 }
 
-
-uint16_t M2006_Motor::get_raw_angle(motor_id m_id) {
-    return angle_data[m_id];
-}
-int16_t M2006_Motor::get_raw_speed(motor_id m_id) {
-    return speed_data[m_id];
-}
-int16_t M2006_Motor::get_raw_torque(motor_id m_id) {
-    return torque_data[m_id];
-}

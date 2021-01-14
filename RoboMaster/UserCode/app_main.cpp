@@ -20,14 +20,12 @@ GPIO motor_power_switch_02(Motor_Power_Switch_02_GPIO_Port, Motor_Power_Switch_0
 GPIO motor_power_switch_03(Motor_Power_Switch_03_GPIO_Port, Motor_Power_Switch_03_Pin);
 GPIO motor_power_switch_04(Motor_Power_Switch_04_GPIO_Port, Motor_Power_Switch_04_Pin);
 
-int16_t speed, torque;
-uint16_t angle;
 
 extern UART_HandleTypeDef huart2;
 USART serial(&huart2);
 
 extern CAN_HandleTypeDef hcan1;
-DjiRM::M2006_Motor motors(&hcan1);
+DjiRM::M2006_Motor motors(&hcan1, 1.00, 0.00, 0.00); // Manually Enter PID consts here (P.S.: can also use update_pid_const(...) to dynamically updating them later)
 
 extern SPI_HandleTypeDef hspi4;
 SPI ras_spi(&hspi4);
@@ -76,14 +74,18 @@ void setup(void) {
 void defaultLoop(void) {
 
 
-    motors.init();
+	motors.init();
 
-    // Program white button for safety reasons
-     while(button.read() == Low){
-    	 motors.stop();
-     }
+    // wait until white button is pressed to proceed, for safety reasons
+	while(button.read() == Low){
+		motors.set_current(0, 0, 0, 0);
+	}
 
     //motors.motor_test();
+
+
+    int16_t speed, torque;
+    uint16_t angle;
     while (true){
     	motors.set_current(10000, 10000, 10000, 10000);
     	// serial << "Motor on" << stf::endl;
@@ -94,13 +96,7 @@ void defaultLoop(void) {
         serial << "[Speed : " << speed  << "]";
         serial << "[Torque: " << torque << "]" << stf::endl;
     }
-//	while (true) {
-////		motors.set_current(10000,10000,-10000,-10000);
-////		delay(500);
-////		motors.set_current(0,0,0,0);
-//		serial << "Test RoboMaster" << stf::endl;
-//		delay(100);
-//	}
+
 
 
     while(1);
@@ -151,10 +147,10 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-	motors.test_update();
-	delay(1000);
+	motors.pid_update_motor_currents();
+	delay(motors.get_ctrl_period_ms());
 }
 
 void stf::exception(const char* str) {
-    // serial << stf::endl << "*****" << string(str) << stf::endl;
+    serial << stf::endl << "*****" << string(str) << stf::endl;
 }
