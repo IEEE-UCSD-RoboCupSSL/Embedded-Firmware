@@ -40,7 +40,7 @@ namespace DjiRM {
 		PID_Controller<float> m3_ctrl;
 		PID_Controller<float> m4_ctrl;
 
-		int16_t max_raw_speed = 19400;
+		int16_t max_raw_speed = 19100;
 
 		float m1_vel, m2_vel, m3_vel, m4_vel;
 

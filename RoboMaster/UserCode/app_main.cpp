@@ -41,6 +41,8 @@ GPIO ist8310_reset(IST8310_Reset_GPIO_Port, IST8310_Reset_Pin);
 
 bool blinkLED_switch = true;
 
+bool is_motor_init = false;
+
 
 void setup(void) {
     
@@ -74,6 +76,8 @@ void setup(void) {
 void defaultLoop(void) {
 
 	motors.init();
+
+	is_motor_init = true;
 
     // wait until white button is pressed to proceed, for safety reasons
 	while(button.read() == Low){
@@ -131,9 +135,12 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-//	motors.pid_update_motor_currents();
-//	//delay(motors.get_ctrl_period_ms());
-//	delay(1000);
+	if (is_motor_init) {
+		motors.pid_update_motor_currents();
+		delay(motors.get_ctrl_period_ms());
+		//delay(1000);
+	}
+
 }
 
 // Allows for continuous output of motor info

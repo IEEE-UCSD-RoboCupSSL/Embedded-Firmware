@@ -154,6 +154,7 @@ void M2006_Motor::update_pid_consts(float Kp, float Ki, float Kd) {
 	m4_ctrl.update_pid_consts(Kp, Ki, Kd);
 }
 
+// Calculate period from frequency
 uint32_t M2006_Motor::get_ctrl_period_ms(void) {
 	return (uint32_t)((1.00 / (float)pid_ctrl_freq_Hz) * 1000.00);
 }
@@ -161,6 +162,7 @@ uint32_t M2006_Motor::get_ctrl_period_ms(void) {
 void M2006_Motor::pid_update_motor_currents(void) {
 	float new_curr1, new_curr2, new_curr3, new_curr4;
 	// Argument == error
+	// set_velocity() sets m1-m4_vel
 	new_curr1 = m1_ctrl.calculate(m1_vel - get_velocity(Motor1));
 	new_curr2 = m2_ctrl.calculate(m2_vel - get_velocity(Motor2));
 	new_curr3 = m3_ctrl.calculate(m3_vel - get_velocity(Motor3));
@@ -174,7 +176,8 @@ void M2006_Motor::pid_update_motor_currents(void) {
 									to_range((float)-max_current, (float)max_current));
 	new_curr4 = stf::map(new_curr4, from_range(-100.00f, 100.00f),
 									to_range((float)-max_current, (float)max_current));
-	set_current((int16_t)new_curr1, (int16_t)new_curr2, (int16_t)new_curr3, (int16_t)new_curr4);
+
+	//set_current((int16_t)new_curr1, (int16_t)new_curr2, (int16_t)new_curr3, (int16_t)new_curr4);
 }
 
 // vel range: -100.00 ~ 100.00, where 100.00 means 100% of max possible velocity
