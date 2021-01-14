@@ -18,6 +18,8 @@ extern "C" void blinkLEDLoop(void);
 
 extern "C" void updatePIDLoop(void);
 
+extern "C" void printInfoLoop(void);
+
 /* For task2 ... task 3...  configure their settings in cubemx GUI 
  * and generate new code, 
  * then call the loop# func in the loop of startTask0#  

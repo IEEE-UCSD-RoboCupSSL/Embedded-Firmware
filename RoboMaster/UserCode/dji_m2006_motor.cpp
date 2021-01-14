@@ -129,17 +129,20 @@ int16_t M2006_Motor::get_raw_torque(motor_id m_id) {
     return torque_data[m_id];
 }
 
+// make velocity unit-less (%)
 float M2006_Motor::get_velocity(motor_id m_id) {
-	if(get_raw_torque(m_id) > 0) {
-		return stf::map((float)get_raw_speed(m_id),
-				   from_range((float)0.00, (float)max_raw_speed),
-				   to_range((float)0.00, (float)100.00));
+	float raw_speed = get_raw_speed(m_id);
+
+	if (raw_speed > max_raw_speed) {
+		raw_speed = max_raw_speed;
 	}
-	else {
-		return -stf::map((float)get_raw_speed(m_id),
-				   from_range((float)0.00, (float)max_raw_speed),
-				   to_range((float)0.00, (float)100.00));
+	if (raw_speed < -max_raw_speed) {
+		raw_speed = -max_raw_speed;
 	}
+	return stf::map(raw_speed,
+					   from_range((float)-max_raw_speed, (float)max_raw_speed),
+					   to_range((float)-100.00, (float)100.00));
+
 }
 
 
@@ -157,19 +160,20 @@ uint32_t M2006_Motor::get_ctrl_period_ms(void) {
 
 void M2006_Motor::pid_update_motor_currents(void) {
 	float new_curr1, new_curr2, new_curr3, new_curr4;
-	new_curr1 = m1_ctrl.calculate(m1_vel, get_velocity(Motor1));
-	new_curr2 = m1_ctrl.calculate(m2_vel, get_velocity(Motor2));
-	new_curr3 = m1_ctrl.calculate(m3_vel, get_velocity(Motor3));
-	new_curr4 = m1_ctrl.calculate(m4_vel, get_velocity(Motor4));
+	// Argument == error
+	new_curr1 = m1_ctrl.calculate(m1_vel - get_velocity(Motor1));
+	new_curr2 = m2_ctrl.calculate(m2_vel - get_velocity(Motor2));
+	new_curr3 = m3_ctrl.calculate(m3_vel - get_velocity(Motor3));
+	new_curr4 = m4_ctrl.calculate(m4_vel - get_velocity(Motor4));
 
 	new_curr1 = stf::map(new_curr1, from_range(-100.00f, 100.00f),
-									to_range(-(float)max_current, (float)max_current));
+									to_range((float)-max_current, (float)max_current));
 	new_curr2 = stf::map(new_curr2, from_range(-100.00f, 100.00f),
-									to_range(-(float)max_current, (float)max_current));
+									to_range((float)-max_current, (float)max_current));
 	new_curr3 = stf::map(new_curr3, from_range(-100.00f, 100.00f),
-									to_range(-(float)max_current, (float)max_current));
+									to_range((float)-max_current, (float)max_current));
 	new_curr4 = stf::map(new_curr4, from_range(-100.00f, 100.00f),
-									to_range(-(float)max_current, (float)max_current));
+									to_range((float)-max_current, (float)max_current));
 	set_current((int16_t)new_curr1, (int16_t)new_curr2, (int16_t)new_curr3, (int16_t)new_curr4);
 }
 
@@ -233,6 +237,7 @@ void M2006_Motor::motor_test(motor_id m_id) {
 	stf::notify("led: all on");
 	stf::delay(300);
 	stf::notify("led: all off");
+	// Slowly accelerate motor
 	for(int16_t curr = 0; curr < max_current; curr += current_increment) {
 		if(m_id == Motor1) set_current(curr, 0, 0, 0);
 		if(m_id == Motor2) set_current(0, curr, 0, 0);
@@ -243,6 +248,7 @@ void M2006_Motor::motor_test(motor_id m_id) {
 	stf::notify("led: green on");
 	stf::delay(300);
 	stf::notify("led: green off");
+	// Slowly decelerate motor to negative max
 	for(int16_t curr = max_current; curr > -max_current; curr -= current_increment) {
 		if(m_id == Motor1) set_current(curr, 0, 0, 0);
 		if(m_id == Motor2) set_current(0, curr, 0, 0);
@@ -253,6 +259,7 @@ void M2006_Motor::motor_test(motor_id m_id) {
 	stf::notify("led: red on");
 	stf::delay(300);
 	stf::notify("led: red off");
+	// Accelerate back to zero
 	for(int16_t curr = -max_current; curr < 0; curr += current_increment) {
 		if(m_id == Motor1) set_current(curr, 0, 0, 0);
 		if(m_id == Motor2) set_current(0, curr, 0, 0);

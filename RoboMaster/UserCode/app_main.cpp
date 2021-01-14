@@ -73,7 +73,6 @@ void setup(void) {
 
 void defaultLoop(void) {
 
-
 	motors.init();
 
     // wait until white button is pressed to proceed, for safety reasons
@@ -81,22 +80,7 @@ void defaultLoop(void) {
 		motors.set_current(0, 0, 0, 0);
 	}
 
-    //motors.motor_test();
-
-
-    int16_t speed, torque;
-    uint16_t angle;
-    while (true){
-    	motors.set_current(10000, 10000, 10000, 10000);
-    	// serial << "Motor on" << stf::endl;
-        angle = motors.get_raw_angle(DjiRM::Motor2);
-        speed = motors.get_raw_speed(DjiRM::Motor2);
-        torque = motors.get_raw_torque(DjiRM::Motor2);
-        serial << "[Angle : " << angle  << "]";
-        serial << "[Speed : " << speed  << "]";
-        serial << "[Torque: " << torque << "]" << stf::endl;
-    }
-
+    motors.motor_test(DjiRM::Motor2);
 
 
     while(1);
@@ -147,8 +131,25 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-	motors.pid_update_motor_currents();
-	delay(motors.get_ctrl_period_ms());
+//	motors.pid_update_motor_currents();
+//	//delay(motors.get_ctrl_period_ms());
+//	delay(1000);
+}
+
+// Allows for continuous output of motor info
+void printInfoLoop(void) {
+//    int16_t speed, torque;
+//    uint16_t angle;
+//	// serial << "Motor on" << stf::endl;
+//	angle = motors.get_raw_angle(DjiRM::Motor2);
+//	speed = motors.get_raw_speed(DjiRM::Motor2);
+//	torque = motors.get_raw_torque(DjiRM::Motor2);
+//	serial << "[Angle : " << angle  << "]";
+//	serial << "[Speed : " << speed  << "]";
+//	serial << "[Torque: " << torque << "]" << stf::endl;
+
+	// float or double CANNOT be printed
+	serial << (int32_t)(motors.get_velocity(DjiRM::Motor2)*100.00) << stf::endl;
 }
 
 void stf::exception(const char* str) {

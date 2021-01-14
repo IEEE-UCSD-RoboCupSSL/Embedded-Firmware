@@ -34,13 +34,13 @@ namespace DjiRM {
          * This is due to Rx interrupt callback is defined as a C function, which
          * can not reside or share variable within a class */
 
-        uint32_t pid_ctrl_freq_Hz = 5000; // default 5000Hz
+        float pid_ctrl_freq_Hz = 5000.00; // default 5000Hz
         PID_Controller<float> m1_ctrl;
 		PID_Controller<float> m2_ctrl;
 		PID_Controller<float> m3_ctrl;
 		PID_Controller<float> m4_ctrl;
 
-		int16_t max_raw_speed = 10000; // To-do
+		int16_t max_raw_speed = 19400;
 
 		float m1_vel, m2_vel, m3_vel, m4_vel;
 
@@ -54,7 +54,7 @@ namespace DjiRM {
             this->hcanx = hcanx;
         }
 
-        M2006_Motor(CAN_HandleTypeDef *hcanx, float Kp, float Ki, float Kd, uint32_t ctrl_freq_Hz) :
+        M2006_Motor(CAN_HandleTypeDef *hcanx, float Kp, float Ki, float Kd, float ctrl_freq_Hz) :
     										    m1_ctrl(Kp, Ki, Kd),
 												m2_ctrl(Kp, Ki, Kd),
 												m3_ctrl(Kp, Ki, Kd),

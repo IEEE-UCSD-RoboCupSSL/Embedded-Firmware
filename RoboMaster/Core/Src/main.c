@@ -72,7 +72,7 @@ const osThreadAttr_t blinkLEDTask_attributes = {
 };
 /* Definitions for UpdatePIDTask */
 osThreadId_t UpdatePIDTaskHandle;
-uint32_t myTask03Buffer[ 256 ];
+uint32_t myTask03Buffer[ 512 ];
 osStaticThreadDef_t myTask03ControlBlock;
 const osThreadAttr_t UpdatePIDTask_attributes = {
   .name = "UpdatePIDTask",
@@ -81,6 +81,18 @@ const osThreadAttr_t UpdatePIDTask_attributes = {
   .cb_mem = &myTask03ControlBlock,
   .cb_size = sizeof(myTask03ControlBlock),
   .priority = (osPriority_t) osPriorityAboveNormal,
+};
+/* Definitions for printInfo */
+osThreadId_t printInfoHandle;
+uint32_t printInfoBuffer[ 512 ];
+osStaticThreadDef_t printInfoControlBlock;
+const osThreadAttr_t printInfo_attributes = {
+  .name = "printInfo",
+  .stack_mem = &printInfoBuffer[0],
+  .stack_size = sizeof(printInfoBuffer),
+  .cb_mem = &printInfoControlBlock,
+  .cb_size = sizeof(printInfoControlBlock),
+  .priority = (osPriority_t) osPriorityBelowNormal,
 };
 /* USER CODE BEGIN PV */
 
@@ -97,12 +109,14 @@ static void MX_I2C2_Init(void);
 void StartDefaultTask(void *argument);
 void StartBlinkLEDTask(void *argument);
 void StartUpdatePIDTask(void *argument);
+void StartPrintInfo(void *argument);
 
 /* USER CODE BEGIN PFP */
 extern void setup();
 extern void defaultLoop();
 extern void blinkLEDLoop();
 extern void updatePIDLoop();
+extern void printInfoLoop();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -175,6 +189,9 @@ int main(void)
 
   /* creation of UpdatePIDTask */
   UpdatePIDTaskHandle = osThreadNew(StartUpdatePIDTask, NULL, &UpdatePIDTask_attributes);
+
+  /* creation of printInfo */
+  printInfoHandle = osThreadNew(StartPrintInfo, NULL, &printInfo_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -553,6 +570,25 @@ void StartUpdatePIDTask(void *argument)
 	  osDelay(1);
   }
   /* USER CODE END StartUpdatePIDTask */
+}
+
+/* USER CODE BEGIN Header_StartPrintInfo */
+/**
+* @brief Function implementing the printInfo thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartPrintInfo */
+void StartPrintInfo(void *argument)
+{
+  /* USER CODE BEGIN StartPrintInfo */
+  /* Infinite loop */
+  for(;;)
+  {
+	printInfoLoop();
+    osDelay(1);
+  }
+  /* USER CODE END StartPrintInfo */
 }
 
  /**
