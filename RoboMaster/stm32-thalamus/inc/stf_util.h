@@ -3,6 +3,7 @@
 
 
 #include "stf_dependancy.h"
+#include <string>
 
 #define Pi 3.14159265358979323846
 
@@ -41,7 +42,7 @@ namespace stf {
     template <typename T1, typename T2, typename T3>
     T1 map(T1 x, from_range(T2 fmin, T2 fmax), to_range(T3 tmin, T3 tmax)) {
         if(x < fmin || x > fmax) {
-            exception("map: invalid param: x is not within from_range");
+            exception("map: invalid param: x is not within from_range ");
             return 0;
         }
         return T1(((double(x) - double(fmin)) / (double(fmax) - double(fmin))) 

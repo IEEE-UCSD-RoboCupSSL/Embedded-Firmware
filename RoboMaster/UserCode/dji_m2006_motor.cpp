@@ -168,16 +168,28 @@ void M2006_Motor::pid_update_motor_currents(void) {
 	new_curr3 = m3_ctrl.calculate(m3_vel - get_velocity(Motor3));
 	new_curr4 = m4_ctrl.calculate(m4_vel - get_velocity(Motor4));
 
-	new_curr1 = stf::map(new_curr1, from_range(-100.00f, 100.00f),
+	if (new_curr1 > 100.00 ) new_curr1 = 100.00;
+	if (new_curr1 < -100.00 ) new_curr1 = -100.00;
+	if (new_curr2 > 100.00 ) new_curr2 = 100.00;
+	if (new_curr2 < -100.00 ) new_curr2 = -100.00;
+	if (new_curr3 > 100.00 ) new_curr3 = 100.00;
+	if (new_curr3 < -100.00 ) new_curr3 = -100.00;
+	if (new_curr4 > 100.00 ) new_curr4= 100.00;
+	if (new_curr4 < -100.00 ) new_curr4 = -100.00;
+
+
+
+	// map from percentage to amperes
+	new_curr1 = stf::map(new_curr1, from_range((float)-100.00, (float)100.00),
 									to_range((float)-max_current, (float)max_current));
-	new_curr2 = stf::map(new_curr2, from_range(-100.00f, 100.00f),
+	new_curr2 = stf::map(new_curr2, from_range((float)-100.00, (float)100.00),
 									to_range((float)-max_current, (float)max_current));
-	new_curr3 = stf::map(new_curr3, from_range(-100.00f, 100.00f),
+	new_curr3 = stf::map(new_curr3, from_range((float)-100.00, (float)100.00),
 									to_range((float)-max_current, (float)max_current));
-	new_curr4 = stf::map(new_curr4, from_range(-100.00f, 100.00f),
+	new_curr4 = stf::map(new_curr4, from_range((float)-100.00, (float)100.00),
 									to_range((float)-max_current, (float)max_current));
 
-	//set_current((int16_t)new_curr1, (int16_t)new_curr2, (int16_t)new_curr3, (int16_t)new_curr4);
+	set_current((int16_t)new_curr1, (int16_t)new_curr2, (int16_t)new_curr3, (int16_t)new_curr4);
 }
 
 // vel range: -100.00 ~ 100.00, where 100.00 means 100% of max possible velocity
