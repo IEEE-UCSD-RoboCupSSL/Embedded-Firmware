@@ -25,7 +25,8 @@ extern UART_HandleTypeDef huart2;
 USART serial(&huart2);
 
 extern CAN_HandleTypeDef hcan1;
-DjiRM::M2006_Motor motors(&hcan1, 1.5, 0.00, 0.00); // Manually Enter PID consts here (P.S.: can also use update_pid_const(...) to dynamically updating them later)
+// DJI EX: P = 1.5, I = 0.1
+DjiRM::M2006_Motor motors(&hcan1, 1.5, 10, 0.1); // Manually Enter PID consts here (P.S.: can also use update_pid_const(...) to dynamically updating them later)
 
 extern SPI_HandleTypeDef hspi4;
 SPI ras_spi(&hspi4);
@@ -94,9 +95,9 @@ void defaultLoop(void) {
 //		delay(2000);
 //		motors.set_velocity(25, 25, 25, 25);
 //		delay(2000);
-//		motors.set_velocity(50, 50, 50, 50);
-//		delay(2000);
-		motors.set_velocity(90, 90, 90, 90);
+		motors.set_velocity(50, 50, 50, 50);
+		delay(2000);
+//		motors.set_velocity(100, 100, 100, 100);
 		delay(2000);
 
 	}
@@ -172,7 +173,9 @@ void printInfoLoop(void) {
 //	serial << "[Torque: " << torque << "]" << stf::endl;
 
 	// float or double CANNOT be printed
-	serial << (int32_t)(motors.get_velocity(DjiRM::Motor2)*100.00) << stf::endl;
+	serial << (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00 / 100.0) << "."
+			<< (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00) % 100 << stf::endl;
+
 }
 
 void stf::exception(const char* str) {

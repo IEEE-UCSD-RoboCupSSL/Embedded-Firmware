@@ -131,7 +131,7 @@ public:
         if(is_first_time) return first_time_handle(curr_error);
         float period = get_period();
         T derivative = (curr_error - prev_error) / period;
-        this->integral += curr_error * period / 1000.000;
+        this->integral += curr_error * period / 1000.000; // scale Ki to be in similar range constants
         T output = (Kp * curr_error) + (Kd * derivative) + (Ki * integral);
         prev_error = curr_error;
         return output;
