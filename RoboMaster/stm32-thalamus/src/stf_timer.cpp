@@ -9,10 +9,10 @@ Timer* active_tims[Max_Num_TIMs];
 
 
 Timer::Timer(TIM_HandleTypeDef *htimx, uint32_t APBx_division_factor, 
-              tim_resolution resoltion) {
+              tim_resolution resolution) {
 	this->htimx = htimx;
 	this->APBx_division_factor = APBx_division_factor;
-	this->resolution = resoltion;
+	this->resolution = resolution;
 	this->mode = Uninitialized;
 }
 
@@ -141,6 +141,7 @@ void Timer::set_pwm_frequency(uint32_t pwm_period_cnt, uint32_t pwm_freq_Hz) {
 	this->timer_frequency = timer_freq;
 	this->prescaler = max_freq_allowed / timer_frequency - 1;
 	this->ARR = max_freq_allowed / (prescaler + 1) / pwm_freq_Hz;
+	set_prescaler(prescaler);
 }
 
 
@@ -152,6 +153,7 @@ void Timer::set_timer_frequency(uint32_t timer_freq_Hz) {
 	}
 	this->prescaler = max_freq_allowed / timer_freq_Hz - 1;
 	this->timer_frequency = max_freq_allowed / (this->prescaler + 1);
+	set_prescaler(prescaler);
 } 
 
 

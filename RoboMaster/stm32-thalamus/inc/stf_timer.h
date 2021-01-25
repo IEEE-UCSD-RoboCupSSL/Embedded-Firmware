@@ -101,7 +101,7 @@ namespace stf {
         volatile int64_t encoder_overflow = 0;
 
 		Timer(TIM_HandleTypeDef *htimx, uint32_t APBx_division_factor, 
-              tim_resolution resoltion);
+              tim_resolution resolution);
 		~Timer();
 
 

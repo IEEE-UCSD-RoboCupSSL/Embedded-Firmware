@@ -21,6 +21,10 @@ GPIO motor_power_switch_03(Motor_Power_Switch_03_GPIO_Port, Motor_Power_Switch_0
 GPIO motor_power_switch_04(Motor_Power_Switch_04_GPIO_Port, Motor_Power_Switch_04_Pin);
 
 
+extern TIM_HandleTypeDef htim2;
+Timer pwm_signal(&htim2, 1, TIM32Bit);
+
+
 extern UART_HandleTypeDef huart2;
 USART serial(&huart2);
 
@@ -58,7 +62,8 @@ void setup(void) {
     motor_power_switch_03.write(High);
     motor_power_switch_04.write(High);
 
-
+	pwm_signal.init_pwm_generation(1000, 1000);
+	pwm_signal.pwm_generation_begin(Channel2);
 
     // byte_t id = imu.init(ist8310_reset);
 //    serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
@@ -80,28 +85,32 @@ void setup(void) {
 
 void defaultLoop(void) {
 
-	motors.init();
-
-	is_motor_init = true;
-
-    // wait until white button is pressed to proceed, for safety reasons
-	while(button.read() == Low){
-		motors.set_current(0, 0, 0, 0);
-	}
-
-    // motors.motor_test(DjiRM::Motor2);
-	while(true){
-//		motors.set_velocity(10, 10, 10, 10);
+//	motors.init();
+//
+//	is_motor_init = true;
+//
+//    // wait until white button is pressed to proceed, for safety reasons
+//	while(button.read() == Low){
+//		motors.set_current(0, 0, 0, 0);
+//	}
+//
+//    // motors.motor_test(DjiRM::Motor2);
+//	while(true){
+////		motors.set_velocity(10, 10, 10, 10);
+////		delay(2000);
+////		motors.set_velocity(25, 25, 25, 25);
+////		delay(2000);
+//		motors.set_velocity(50, 50, 50, 50);
 //		delay(2000);
-//		motors.set_velocity(25, 25, 25, 25);
+////		motors.set_velocity(100, 100, 100, 100);
 //		delay(2000);
-		motors.set_velocity(50, 50, 50, 50);
-		delay(2000);
-//		motors.set_velocity(100, 100, 100, 100);
-		delay(2000);
+//
+//	}
 
+	// pwm_signal.set_pwm_duty_cycle_cnt(Channel1, 50);
+	while (true) {
+		pwm_signal.set_pwm_duty_cycle<float>(Channel2, 50);
 	}
-
 
 
     while(1);
@@ -177,6 +186,8 @@ void printInfoLoop(void) {
 			<< (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00) % 100 << stf::endl;
 
 }
+
+
 
 void stf::exception(const char* str) {
     serial << stf::endl << "*****" << string(str) << stf::endl;
