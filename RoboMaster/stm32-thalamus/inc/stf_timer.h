@@ -104,6 +104,9 @@ namespace stf {
               tim_resolution resolution);
 		~Timer();
 
+		/* Note: in newer version of cubemx/cubeide,
+		 * make sure to check the auto-reload preload
+		 * box in .ioc */
 
         void set_prescaler(uint32_t prescaler_val);
         uint32_t get_prescaler(void);
