@@ -1,6 +1,7 @@
 #include "app_main.h"
 #include "dji_m2006_motor.h"
 #include "mpu6500_ist8310.h"
+#include "usb_device_vcp.h"
 
 
 #include <iostream>
@@ -22,8 +23,9 @@ GPIO motor_power_switch_04(Motor_Power_Switch_04_GPIO_Port, Motor_Power_Switch_0
 
 
 extern TIM_HandleTypeDef htim2;
-Timer pwm_signal(&htim2, 1, TIM32Bit);
+Timer pwm_signal(&htim2, 2, TIM32Bit);
 
+USB_VCP usb;
 
 extern UART_HandleTypeDef huart2;
 USART serial(&huart2);
@@ -64,6 +66,7 @@ void setup(void) {
 
 	pwm_signal.init_pwm_generation(1000, 1000);
 	pwm_signal.pwm_generation_begin(Channel2);
+
 
     // byte_t id = imu.init(ist8310_reset);
 //    serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
