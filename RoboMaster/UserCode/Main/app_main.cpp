@@ -67,6 +67,7 @@ void setup(void) {
 	pwm_signal.init_pwm_generation(1000, 1000);
 	pwm_signal.pwm_generation_begin(Channel2);
 
+	usb.init();
 
     // byte_t id = imu.init(ist8310_reset);
 //    serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
@@ -109,6 +110,11 @@ void defaultLoop(void) {
 //		delay(2000);
 //
 //	}
+	while(true){
+		std::string test_string = usb.read_line();
+		std::string space = "GME to Pluto\n\r";
+		usb.send_packet(test_string.append(space));
+	}
 
 	// pwm_signal.set_pwm_duty_cycle_cnt(Channel1, 50);
 	while (true) {

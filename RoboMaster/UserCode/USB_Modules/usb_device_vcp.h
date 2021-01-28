@@ -42,7 +42,7 @@ public:
 
 	/* Rx methods*/
 	std::string& read_some(void);
-	std::string& read_line(char delim = '\r');
+	std::string read_line(char delim = '\r');
 
 
 	inline uint32_t get_tx_buffer_size(void) {return APP_TX_DATA_SIZE;}

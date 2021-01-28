@@ -56,7 +56,7 @@ std::string& USB_VCP::read_some() {
 
 }
 
-std::string& USB_VCP::read_line(char delim) {
+std::string USB_VCP::read_line(char delim) {
 	std::string str;
 	do {
 		str = read_some();
