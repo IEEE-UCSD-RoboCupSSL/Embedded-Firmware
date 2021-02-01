@@ -97,6 +97,54 @@ const osThreadAttr_t printInfo_attributes = {
   .cb_size = sizeof(printInfoControlBlock),
   .priority = (osPriority_t) osPriorityBelowNormal,
 };
+/* Definitions for usbReadTask */
+osThreadId_t usbReadTaskHandle;
+uint32_t usbReadTaskBuffer[ 512 ];
+osStaticThreadDef_t usbReadTaskControlBlock;
+const osThreadAttr_t usbReadTask_attributes = {
+  .name = "usbReadTask",
+  .stack_mem = &usbReadTaskBuffer[0],
+  .stack_size = sizeof(usbReadTaskBuffer),
+  .cb_mem = &usbReadTaskControlBlock,
+  .cb_size = sizeof(usbReadTaskControlBlock),
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for usbWriteTask */
+osThreadId_t usbWriteTaskHandle;
+uint32_t usbWriteTaskBuffer[ 512 ];
+osStaticThreadDef_t usbWriteTaskControlBlock;
+const osThreadAttr_t usbWriteTask_attributes = {
+  .name = "usbWriteTask",
+  .stack_mem = &usbWriteTaskBuffer[0],
+  .stack_size = sizeof(usbWriteTaskBuffer),
+  .cb_mem = &usbWriteTaskControlBlock,
+  .cb_size = sizeof(usbWriteTaskControlBlock),
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for ActuatorsTask */
+osThreadId_t ActuatorsTaskHandle;
+uint32_t ActuatorsTaskBuffer[ 2048 ];
+osStaticThreadDef_t ActuatorsTaskControlBlock;
+const osThreadAttr_t ActuatorsTask_attributes = {
+  .name = "ActuatorsTask",
+  .stack_mem = &ActuatorsTaskBuffer[0],
+  .stack_size = sizeof(ActuatorsTaskBuffer),
+  .cb_mem = &ActuatorsTaskControlBlock,
+  .cb_size = sizeof(ActuatorsTaskControlBlock),
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for SensorsTask */
+osThreadId_t SensorsTaskHandle;
+uint32_t SensorsTaskBuffer[ 2048 ];
+osStaticThreadDef_t SensorsTaskControlBlock;
+const osThreadAttr_t SensorsTask_attributes = {
+  .name = "SensorsTask",
+  .stack_mem = &SensorsTaskBuffer[0],
+  .stack_size = sizeof(SensorsTaskBuffer),
+  .cb_mem = &SensorsTaskControlBlock,
+  .cb_size = sizeof(SensorsTaskControlBlock),
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -114,6 +162,10 @@ void StartDefaultTask(void *argument);
 void StartBlinkLEDTask(void *argument);
 void StartUpdatePIDTask(void *argument);
 void StartPrintInfo(void *argument);
+void StartUsbReadTask(void *argument);
+void StartUsbWriteTask(void *argument);
+void StartActuatorsTask(void *argument);
+void StartSensorsTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 extern void setup();
@@ -122,6 +174,10 @@ extern void blinkLEDLoop();
 extern void updatePIDLoop();
 extern void printInfoLoop();
 extern void pwmLoop();
+extern void sensorsLoop();
+extern void actuatorsLoop();
+extern void usbWriteLoop();
+extern void usbReadLoop();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -198,6 +254,18 @@ int main(void)
 
   /* creation of printInfo */
   printInfoHandle = osThreadNew(StartPrintInfo, NULL, &printInfo_attributes);
+
+  /* creation of usbReadTask */
+  usbReadTaskHandle = osThreadNew(StartUsbReadTask, NULL, &usbReadTask_attributes);
+
+  /* creation of usbWriteTask */
+  usbWriteTaskHandle = osThreadNew(StartUsbWriteTask, NULL, &usbWriteTask_attributes);
+
+  /* creation of ActuatorsTask */
+  ActuatorsTaskHandle = osThreadNew(StartActuatorsTask, NULL, &ActuatorsTask_attributes);
+
+  /* creation of SensorsTask */
+  SensorsTaskHandle = osThreadNew(StartSensorsTask, NULL, &SensorsTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -657,6 +725,82 @@ void StartPrintInfo(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartPrintInfo */
+}
+
+/* USER CODE BEGIN Header_StartUsbReadTask */
+/**
+* @brief Function implementing the usbReadTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartUsbReadTask */
+void StartUsbReadTask(void *argument)
+{
+  /* USER CODE BEGIN StartUsbReadTask */
+  /* Infinite loop */
+  for(;;)
+  {
+	usbReadLoop();
+    osDelay(1);
+  }
+  /* USER CODE END StartUsbReadTask */
+}
+
+/* USER CODE BEGIN Header_StartUsbWriteTask */
+/**
+* @brief Function implementing the usbWriteTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartUsbWriteTask */
+void StartUsbWriteTask(void *argument)
+{
+  /* USER CODE BEGIN StartUsbWriteTask */
+  /* Infinite loop */
+  for(;;)
+  {
+	usbWriteLoop();
+    osDelay(1);
+  }
+  /* USER CODE END StartUsbWriteTask */
+}
+
+/* USER CODE BEGIN Header_StartActuatorsTask */
+/**
+* @brief Function implementing the ActuatorsTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartActuatorsTask */
+void StartActuatorsTask(void *argument)
+{
+  /* USER CODE BEGIN StartActuatorsTask */
+  /* Infinite loop */
+  for(;;)
+  {
+	actuatorsLoop();
+    osDelay(1);
+  }
+  /* USER CODE END StartActuatorsTask */
+}
+
+/* USER CODE BEGIN Header_StartSensorsTask */
+/**
+* @brief Function implementing the SensorsTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartSensorsTask */
+void StartSensorsTask(void *argument)
+{
+  /* USER CODE BEGIN StartSensorsTask */
+  /* Infinite loop */
+  for(;;)
+  {
+	sensorsLoop();
+    osDelay(1);
+  }
+  /* USER CODE END StartSensorsTask */
 }
 
  /**

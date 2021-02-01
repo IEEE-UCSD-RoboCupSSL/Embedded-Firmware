@@ -20,6 +20,17 @@ extern "C" void updatePIDLoop(void);
 
 extern "C" void printInfoLoop(void);
 
+extern "C" void actuatorsLoop(void);
+
+extern "C" void sensorsLoop(void);
+
+extern "C" void usbReadLoop(void);
+
+extern "C" void usbWriteLoop(void);
+
+
+
+
 /* For task2 ... task 3...  configure their settings in cubemx GUI 
  * and generate new code, 
  * then call the loop# func in the loop of startTask0#  

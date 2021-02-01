@@ -110,17 +110,12 @@ void defaultLoop(void) {
 //		delay(2000);
 //
 //	}
-	while(true){
-		std::string test_string = usb.read_line();
-		std::string space = "GME to Pluto\n\r";
-		usb.send_packet(test_string.append(space));
-	}
+
 
 	// pwm_signal.set_pwm_duty_cycle_cnt(Channel1, 50);
-	while (true) {
-		pwm_signal.set_pwm_duty_cycle<float>(Channel2, 50);
-	}
-
+//	while (true) {
+//		pwm_signal.set_pwm_duty_cycle<float>(Channel2, 50);
+//	}
 
     while(1);
     /*
@@ -193,6 +188,26 @@ void printInfoLoop(void) {
 	// float or double CANNOT be printed
 	serial << (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00 / 100.0) << "."
 			<< (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00) % 100 << stf::endl;
+
+}
+
+void sensorsLoop(void) {
+
+}
+
+void actuatorsLoop(void) {
+
+}
+
+void usbReadLoop(void){
+	while(true){
+		std::string test_string = usb.read_line();
+		std::string space = "GME to Pluto\n\r";
+		usb.send_packet(test_string.append(space));
+	}
+}
+
+void usbWriteLoop(void){
 
 }
 
