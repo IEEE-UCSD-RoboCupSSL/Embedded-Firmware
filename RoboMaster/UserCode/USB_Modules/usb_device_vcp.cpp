@@ -48,7 +48,7 @@ std::string& USB_VCP::read_some() {
 	size_t num_bytes_received;
 	do {
 		num_bytes_received = xMessageBufferReceive(msg_buf,
-				(void*)rx_msg_buf, sizeof(rx_msg_buf), 300);
+				(void*)rx_msg_buf, RX_MSG_BUF_SIZE, 300);
 	} while(num_bytes_received <= 0);
 
 	some_str = std::string((const char*)rx_msg_buf, num_bytes_received);
@@ -68,6 +68,16 @@ std::string USB_VCP::read_line(char delim) {
 }
 
 
+// char* USB_VCP::read_bytes() {
+// 	size_t num_bytes_received;
+// 	do {
+// 		num_bytes_received = xMessageBufferReceive(msg_buf,
+// 				(void*)rx_msg_buf, sizeof(rx_msg_buf), 300);
+// 	} while(num_bytes_received <= 0);
+
+// 	some_str = std::string((const char*)rx_msg_buf, num_bytes_received);
+// 	return some_str;
+// }
 
 
 

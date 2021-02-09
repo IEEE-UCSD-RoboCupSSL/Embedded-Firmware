@@ -59,7 +59,7 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
+  .stack_size = 128 * 4
 };
 /* Definitions for blinkLEDTask */
 osThreadId_t blinkLEDTaskHandle;

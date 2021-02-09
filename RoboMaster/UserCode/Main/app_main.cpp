@@ -200,15 +200,17 @@ void actuatorsLoop(void) {
 }
 
 void usbReadLoop(void){
-	while(true){
-		std::string test_string = usb.read_line();
-		std::string space = "GME to Pluto\n\r";
-		usb.send_packet(test_string.append(space));
-	}
+
 }
 
 void usbWriteLoop(void){
+	while(true){
+		//std::string test_string = usb.read_line();
+		std::string space = "GME to Pluto\n";
+		// usb.send_packet(test_string.append(space));
+        usb.send_packet(space);
 
+	}
 }
 
 
