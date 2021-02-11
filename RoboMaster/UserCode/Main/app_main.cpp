@@ -2,6 +2,7 @@
 #include "USB/usb_device_vcp.h"
 #include "Motor/dji_m2006_motor.hpp"
 #include "IMU/mpu6500_ist8310.hpp"
+#include "IMU/Adafruit_AHRS_Mahony.h"
 
 #include <iostream>
 #include <vector>
@@ -40,6 +41,9 @@ extern SPI_HandleTypeDef hspi5;
 SPI imu_spi(&hspi5);
 GPIO imu_chip_select(SPI5_CS_GPIO_Port, SPI5_CS_Pin);
 MPU6500_IST8310 imu(imu_spi, imu_chip_select);
+Adafruit_Mahony ahrs;
+float ahrs_update_freq = 50; // Hz
+
 
 
 GPIO ras_spi_cs(SPI4_CS_GPIO_Port, SPI4_CS_Pin);
@@ -47,13 +51,10 @@ GPIO ist8310_reset(IST8310_Reset_GPIO_Port, IST8310_Reset_Pin);
 
 bool blinkLED_switch = true;
 
-bool is_motor_init = false;
-
+bool is_motor_initialized = false;
+bool is_imu_initialized = false;
 
 void setup(void) {
-    
-    // util_test(); while(1);
-    
     blinkLED_switch = false;
     serial << "=========================================================" << stf::endl;
     serial << "Hello World" << stf::endl;
@@ -68,22 +69,11 @@ void setup(void) {
 
 	usb.init();
 
-    // byte_t id = imu.init(ist8310_reset);
-//    serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
+    byte_t id = imu.init(ist8310_reset);
+    serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
+    ahrs.begin(ahrs_update_freq);
 
-
-/*
-    serial << ">";
-    string start_str = serial.readWord();
-    serial << start_str << stf::endl;
-    while(start_str != "start") {
-        serial << ">";
-        start_str = serial.readWord();
-        serial << start_str << stf::endl;
-    }
-    */
     blinkLED_switch = true;
-
 }
 
 void defaultLoop(void) {
@@ -116,37 +106,15 @@ void defaultLoop(void) {
 //		pwm_signal.set_pwm_duty_cycle<float>(Channel2, 50);
 //	}
 
-    while(1);
-    /*
-    while(1) {
-        imu.read_data();
-        
-        
-        serial << imu.data_string() << stf::endl;
-        
-        delay(500);
+
+	while(true) {
+		serial << "Accel: " << imu.read_accel_data().to_string() << stf::endl;
+	}
+
+
+    while(true) { // do nothing
+    	delay(1000);
     }
-    */
-
-/*
-    ras_spi.set_txrx_timeout(1000000);
-
-    string str;
-    byte_t byte;
-    string dummy_str = "xxxx";
-    while(1) {
-        serial << "[receiving ...]" << stf::endl;
-        //serial << ras_spi.get_txrx_status() << ", " << ras_spi.get_txrx_status() << stf::endl;
-        while(ras_spi_cs.read() == Low);
-        str = ras_spi.tranceive(dummy_str); 
-        //byte = ras_spi.tranceive(0xFF);
-        //serial << (char)byte << stf::endl;
-        serial << str << stf::endl;
-        //delay(500);
-    }
-*/
-
-
 }
 
 
@@ -164,12 +132,24 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-	if (is_motor_init) {
+	if (is_motor_initialized) {
 		motors.pid_update_motor_currents();
 		delay(motors.get_ctrl_period_ms());
-		//delay(1000);
 	}
+}
 
+void updateIMULoop(void) {
+	if(is_imu_initialized) {
+		uint32_t update_period = (uint32_t) (1000.00f / ahrs_update_freq);
+		MPU6500_IST8310::data accel, gyro, mag;
+
+		accel = imu.read_accel_data();
+		gyro = imu.read_gyro_data();
+		mag = imu.read_compass_data();
+		ahrs.update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, mag.x, mag.y, mag.z);
+
+		delay(update_period);
+	}
 }
 
 // Allows for continuous output of motor info
@@ -217,3 +197,23 @@ void usbWriteLoop(void){
 void stf::exception(const char* str) {
     serial << stf::endl << "*****" << string(str) << stf::endl;
 }
+
+
+
+/*
+    ras_spi.set_txrx_timeout(1000000);
+
+    string str;
+    byte_t byte;
+    string dummy_str = "xxxx";
+    while(1) {
+        serial << "[receiving ...]" << stf::endl;
+        //serial << ras_spi.get_txrx_status() << ", " << ras_spi.get_txrx_status() << stf::endl;
+        while(ras_spi_cs.read() == Low);
+        str = ras_spi.tranceive(dummy_str);
+        //byte = ras_spi.tranceive(0xFF);
+        //serial << (char)byte << stf::endl;
+        serial << str << stf::endl;
+        //delay(500);
+    }
+*/

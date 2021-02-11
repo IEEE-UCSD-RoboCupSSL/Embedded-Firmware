@@ -55,6 +55,11 @@ public:
     
     struct data {
     	int16_t x, y, z;
+    	std::string to_string(void) {
+			char str[25];
+			sprintf(str, "[%6d, %6d, %6d]", x, y, z);
+			return std::string(str);
+    	}
     };
 
 
@@ -92,7 +97,7 @@ public:
     void set_accel_full_scale_range(AccelScale scale);
 
     byte_t read_who_am_i_reg(void);
-    std::string data_string(void);
+    // std::string data_string(void);
 
 };
 

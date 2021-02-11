@@ -433,15 +433,15 @@ void MPU6500_IST8310::set_accel_full_scale_range(AccelScale scale) {
 }
 
 
-std::string MPU6500_IST8310::data_string(void) {
-    char str[150];
-    sprintf(str, "Accel[%6d, %6d, %6d] Gyro[%6d, %6d, %6d] Compass[%6d, %6d, %6d] temp[%6lf]", 
-            accel_x, accel_y, accel_z,
-            gyro_x, gyro_y, gyro_z,
-            mag_x, mag_y, mag_z,
-            temperature);
-    return std::string(str);
-}
+//std::string MPU6500_IST8310::data_string(void) {
+//    char str[150];
+//    sprintf(str, "Accel[%6d, %6d, %6d] Gyro[%6d, %6d, %6d] Compass[%6d, %6d, %6d] temp[%6lf]",
+//            accel_x, accel_y, accel_z,
+//            gyro_x, gyro_y, gyro_z,
+//            mag_x, mag_y, mag_z,
+//            temperature);
+//    return std::string(str);
+//}
 
 
 MPU6500_IST8310::data MPU6500_IST8310::read_accel_data(void) {

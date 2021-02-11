@@ -1,6 +1,7 @@
 #ifndef __stf_MAIN_H
 #define __stf_MAIN_H
 
+
 #include "stf.h"
 
 
@@ -28,6 +29,7 @@ extern "C" void usbReadLoop(void);
 
 extern "C" void usbWriteLoop(void);
 
+extern "C" void updateIMULoop(void);
 
 
 
