@@ -1,4 +1,4 @@
-#include "dji_m2006_motor.h"
+#include "dji_m2006_motor.hpp"
 
 #include <iostream>
 #include <vector>

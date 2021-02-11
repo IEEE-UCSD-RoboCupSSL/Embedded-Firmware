@@ -1,8 +1,7 @@
 #include "app_main.h"
-#include "dji_m2006_motor.h"
-#include "mpu6500_ist8310.h"
-#include "usb_device_vcp.h"
-
+#include "USB/usb_device_vcp.h"
+#include "Motor/dji_m2006_motor.hpp"
+#include "IMU/mpu6500_ist8310.hpp"
 
 #include <iostream>
 #include <vector>
@@ -40,7 +39,7 @@ SPI ras_spi(&hspi4);
 extern SPI_HandleTypeDef hspi5;
 SPI imu_spi(&hspi5);
 GPIO imu_chip_select(SPI5_CS_GPIO_Port, SPI5_CS_Pin);
-MPU6500 imu(imu_spi, imu_chip_select);
+MPU6500_IST8310 imu(imu_spi, imu_chip_select);
 
 
 GPIO ras_spi_cs(SPI4_CS_GPIO_Port, SPI4_CS_Pin);

@@ -1,4 +1,4 @@
-#include "mpu6500_ist8310.h"
+#include "IMU/mpu6500_ist8310.hpp"
 #include <string.h>
 
 // Code referenced from bsp_imu.c from the example code provided by Dji
@@ -154,7 +154,7 @@
 using namespace stf;
 
 
-void MPU6500::write_reg(byte_t address, byte_t byte) {
+void MPU6500_IST8310::write_reg(byte_t address, byte_t byte) {
     enable_chip_select();
     // MSB = 0 for write
     address = set_byte_msb_zero(address);
@@ -162,7 +162,7 @@ void MPU6500::write_reg(byte_t address, byte_t byte) {
     spi_bus_ptr->tranceive(byte);
     disable_chip_select();
 }
-byte_t MPU6500::read_reg(byte_t address) {
+byte_t MPU6500_IST8310::read_reg(byte_t address) {
     byte_t rtn;
     enable_chip_select();
     // MSB = 1 for read
@@ -173,7 +173,7 @@ byte_t MPU6500::read_reg(byte_t address) {
     return rtn;  
 }
 
-void MPU6500::mpu_i2c_write_reg(byte_t address, byte_t byte) {
+void MPU6500_IST8310::mpu_i2c_write_reg(byte_t address, byte_t byte) {
     write_reg(MPU6500_I2C_SLV1_CTRL, 0x00); // turn off first
     delay(10);
     write_reg(MPU6500_I2C_SLV1_REG, address);
@@ -186,7 +186,7 @@ void MPU6500::mpu_i2c_write_reg(byte_t address, byte_t byte) {
     delay(10);
 }
 
-byte_t MPU6500::mpu_i2c_read_reg(byte_t address) {
+byte_t MPU6500_IST8310::mpu_i2c_read_reg(byte_t address) {
     byte_t ret;
     //write_reg(MPU6500_I2C_SLV4_CTRL, 0x00);
     //delay(10);
@@ -205,7 +205,7 @@ byte_t MPU6500::mpu_i2c_read_reg(byte_t address) {
  *initialize the MPU6500 I2C Slave 0 for I2C reading.
  *device_address: slave device address, Address[6:0]
  */
-void MPU6500::mpu_master_i2c_auto_read_config(uint8_t device_address, uint8_t reg_address, uint8_t num_bytes)
+void MPU6500_IST8310::mpu_master_i2c_auto_read_config(uint8_t device_address, uint8_t reg_address, uint8_t num_bytes)
 {
     /* 
 	   * configure the device address of the IST8310 
@@ -242,7 +242,7 @@ void MPU6500::mpu_master_i2c_auto_read_config(uint8_t device_address, uint8_t re
 
 
 
-byte_t MPU6500::init(void) {
+byte_t MPU6500_IST8310::init(void) {
 
     /***** init MPU6500 *****/
 
@@ -368,54 +368,54 @@ byte_t MPU6500::init(void) {
     return id;
 }
 
-void MPU6500::read_accel_data(void) {
+void MPU6500_IST8310::collect_accel_data(void) {
     accel_x = read_reg(MPU6500_ACCEL_XOUT_H) << 8 | read_reg(MPU6500_ACCEL_XOUT_L);
     accel_y = read_reg(MPU6500_ACCEL_YOUT_H) << 8 | read_reg(MPU6500_ACCEL_YOUT_L); 
     accel_z = read_reg(MPU6500_ACCEL_ZOUT_H) << 8 | read_reg(MPU6500_ACCEL_ZOUT_L); 
     accel_x -= accel_x_offset; accel_y -= accel_y_offset; accel_z -= accel_z_offset;
 }
 
-void MPU6500::read_gyro_data(void) {
+void MPU6500_IST8310::collect_gyro_data(void) {
     gyro_x = read_reg(MPU6500_GYRO_XOUT_H) << 8 | read_reg(MPU6500_GYRO_XOUT_L);
     gyro_y = read_reg(MPU6500_GYRO_YOUT_H) << 8 | read_reg(MPU6500_GYRO_YOUT_L);
     gyro_z = read_reg(MPU6500_GYRO_ZOUT_H) << 8 | read_reg(MPU6500_GYRO_ZOUT_L);
     gyro_x -= gyro_x_offset; gyro_y -= gyro_y_offset; gyro_z -= gyro_z_offset;
 } 
 
-void MPU6500::read_temp_data(void) {
+void MPU6500_IST8310::collect_temp_data(void) {
     int16_t temp = read_reg(MPU6500_TEMP_OUT_H) << 8 | read_reg(MPU6500_TEMP_OUT_L);
     temperature = temp / 333.87f + 21;
 }
 
-void MPU6500::read_compass_data(void) {
-    compass_x = read_reg(MPU6500_EXT_SENS_DATA_00) << 8 | read_reg(MPU6500_EXT_SENS_DATA_01);
-    compass_y = read_reg(MPU6500_EXT_SENS_DATA_02) << 8 | read_reg(MPU6500_EXT_SENS_DATA_03);
-    compass_z = read_reg(MPU6500_EXT_SENS_DATA_04) << 8 | read_reg(MPU6500_EXT_SENS_DATA_05);
-    compass_x -= compass_x_offset; compass_y -= compass_y_offset; compass_z -= compass_z_offset;
+void MPU6500_IST8310::collect_compass_data(void) {
+    mag_x = read_reg(MPU6500_EXT_SENS_DATA_00) << 8 | read_reg(MPU6500_EXT_SENS_DATA_01);
+    mag_y = read_reg(MPU6500_EXT_SENS_DATA_02) << 8 | read_reg(MPU6500_EXT_SENS_DATA_03);
+    mag_z = read_reg(MPU6500_EXT_SENS_DATA_04) << 8 | read_reg(MPU6500_EXT_SENS_DATA_05);
+    mag_x -= mag_x_offset; mag_y -= mag_y_offset; mag_z -= mag_z_offset;
 }
 
 
 
 
-void MPU6500::measure_offset(int iter) {
+void MPU6500_IST8310::measure_offset(int iter) {
     gyro_x_offset = 0; gyro_y_offset = 0; gyro_z_offset = 0;
     accel_x_offset = 0; accel_y_offset = 0; accel_z_offset = 0;
-    compass_x_offset = 0; compass_y_offset = 0; compass_z_offset = 0;
+    mag_x_offset = 0; mag_y_offset = 0; mag_z_offset = 0;
     for(int i = 0; i < iter; i++) {    
-        read_accel_data();
-        read_gyro_data();
-        read_compass_data();
+        collect_accel_data();
+        collect_gyro_data();
+        collect_compass_data();
         gyro_x_offset += gyro_x; gyro_y_offset += gyro_y; gyro_z_offset += gyro_z;
         accel_x_offset += accel_x; accel_y_offset += accel_y;  accel_z_offset += accel_z;
-        compass_x_offset += compass_x; compass_y_offset += compass_y; compass_z_offset += compass_z;
+        mag_x_offset += mag_x; mag_y_offset += mag_y; mag_z_offset += mag_z;
         delay(5);
     }
     gyro_x_offset /= iter; gyro_y_offset /= iter; gyro_z_offset /= iter;
     accel_x_offset /= iter; accel_y_offset /= iter; accel_z_offset /= iter;
-    compass_x_offset /= iter; compass_y_offset /= iter; compass_z_offset /= iter;
+    mag_x_offset /= iter; mag_y_offset /= iter; mag_z_offset /= iter;
 }
 
-void MPU6500::set_gyro_full_scale_range(GyroScale scale) {
+void MPU6500_IST8310::set_gyro_full_scale_range(GyroScale scale) {
    delay(1);
    if(scale == _250dps) write_reg(MPU6500_GYRO_CONFIG, 0x00);
    if(scale == _500dps) write_reg(MPU6500_GYRO_CONFIG, 0x08);
@@ -423,7 +423,7 @@ void MPU6500::set_gyro_full_scale_range(GyroScale scale) {
    if(scale == _2000dps) write_reg(MPU6500_GYRO_CONFIG, 0x18);
    delay(1);
 }
-void MPU6500::set_accel_full_scale_range(AccelScale scale) {
+void MPU6500_IST8310::set_accel_full_scale_range(AccelScale scale) {
    delay(1);
    if(scale == _2g) write_reg(MPU6500_ACCEL_CONFIG, 0x00);
    if(scale == _4g) write_reg(MPU6500_ACCEL_CONFIG, 0x08);
@@ -433,12 +433,45 @@ void MPU6500::set_accel_full_scale_range(AccelScale scale) {
 }
 
 
-std::string MPU6500::data_string(void) {
+std::string MPU6500_IST8310::data_string(void) {
     char str[150];
     sprintf(str, "Accel[%6d, %6d, %6d] Gyro[%6d, %6d, %6d] Compass[%6d, %6d, %6d] temp[%6lf]", 
             accel_x, accel_y, accel_z,
             gyro_x, gyro_y, gyro_z,
-            compass_x, compass_y, compass_z,
+            mag_x, mag_y, mag_z,
             temperature);
     return std::string(str);
+}
+
+
+MPU6500_IST8310::data MPU6500_IST8310::read_accel_data(void) {
+	collect_accel_data();
+	data d;
+	d.x = this->accel_x;
+	d.y = this->accel_y;
+	d.z = this->accel_z;
+	return d;
+}
+
+MPU6500_IST8310::data MPU6500_IST8310::read_gyro_data(void) {
+	collect_gyro_data();
+	data d;
+	d.x = this->gyro_x;
+	d.y = this->gyro_y;
+	d.z = this->gyro_z;
+	return d;
+}
+
+MPU6500_IST8310::data MPU6500_IST8310::read_compass_data(void) {
+	collect_compass_data();
+	data d;
+	d.x = this->mag_x;
+	d.y = this->mag_y;
+	d.z = this->mag_z;
+	return d;
+}
+
+double MPU6500_IST8310::read_temp_data(void) {
+	collect_temp_data();
+	return temperature;
 }

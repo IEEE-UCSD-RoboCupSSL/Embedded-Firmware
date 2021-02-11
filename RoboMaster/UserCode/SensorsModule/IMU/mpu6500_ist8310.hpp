@@ -6,15 +6,8 @@
 
 
 
-
-
-
-/* MPU6500 + IST8310 IMU Source */
-// although the class is named as MPU6500, but it really should be named as MPU6500_IST8310 which extends the MPU6500 class
-// but for simplication, they get mixed up here
-
-class MPU6500 {
-// Citation: Content in this class is most referenced from the open source example imu code provided by Dji Robomaster
+class MPU6500_IST8310 {
+// Citation: implementations of this class partially references the open source example imu code provided by Dji Robomaster
 private:
     bool is_hardware_chip_select; //if hardware css is enabled, no software is needed to control the css pin
     stf::SPI *spi_bus_ptr;
@@ -33,7 +26,19 @@ private:
     void mpu_master_i2c_auto_read_config(uint8_t device_address, uint8_t reg_address, uint8_t num_bytes);
     void measure_offset(int iter = 300);
 
-public:
+    void collect_accel_data(void);
+    void collect_gyro_data(void);
+    void collect_temp_data(void);
+    void collect_compass_data(void);
+//    void collect_all_data(void) {
+//        collect_accel_data();
+//        collect_gyro_data();
+//        collect_temp_data();
+//        collect_compass_data();
+//    }
+
+
+
 
     int16_t gyro_x = 0, gyro_y = 0, gyro_z = 0;
     int16_t gyro_x_offset = 0, gyro_y_offset = 0, gyro_z_offset = 0;
@@ -41,26 +46,31 @@ public:
     int16_t accel_x = 0, accel_y = 0, accel_z = 0;
     int16_t accel_x_offset = 0, accel_y_offset = 0, accel_z_offset = 0;
 
-    int16_t compass_x = 0, compass_y = 0, compass_z = 0;
-    int16_t compass_x_offset = 0, compass_y_offset = 0, compass_z_offset = 0;
+    int16_t mag_x = 0, mag_y = 0, mag_z = 0;
+    int16_t mag_x_offset = 0, mag_y_offset = 0, mag_z_offset = 0;
 
     double temperature = 0; // degree celsius
 
-
+public:
     
-    MPU6500(stf::SPI& spi_bus) {
+    struct data {
+    	int16_t x, y, z;
+    };
+
+
+    MPU6500_IST8310(stf::SPI& spi_bus) {
         this->spi_bus_ptr = &spi_bus;
         is_hardware_chip_select = true;
         spi_bus.set_txrx_timeout(66); //magic timeout value, not too important
     }
-    MPU6500(stf::SPI& spi_bus, stf::GPIO& chip_select) {
+    MPU6500_IST8310(stf::SPI& spi_bus, stf::GPIO& chip_select) {
         this->spi_bus_ptr = &spi_bus;
         this->chip_select_ptr = &chip_select;
         chip_select_ptr->write(stf::High);
         is_hardware_chip_select = false;
         spi_bus.set_txrx_timeout(66); //magic timeout value, not too important
     }
-    ~MPU6500(void) {}
+    ~MPU6500_IST8310(void) {}
 
     // default:  Gyro scale = +-2000dps, Accel scale = +-8g 
     byte_t init(void);
@@ -72,16 +82,11 @@ public:
     }
     
     void calibrate(int iter = 300) {measure_offset(iter);}
-    void read_accel_data(void);
-    void read_gyro_data(void);
-    void read_temp_data(void);
-    void read_compass_data(void);
-    void read_data(void) {
-        read_accel_data();
-        read_gyro_data();
-        read_temp_data();
-        read_compass_data();
-    }
+    data read_accel_data(void);
+    data read_gyro_data(void);
+    data read_compass_data(void);
+    double read_temp_data(void);
+
 
     void set_gyro_full_scale_range(GyroScale scale);
     void set_accel_full_scale_range(AccelScale scale);
