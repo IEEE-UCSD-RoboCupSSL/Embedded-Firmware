@@ -70,8 +70,11 @@ void setup(void) {
 	usb.init();
 
     byte_t id = imu.init(ist8310_reset);
+    imu.calibrate();
     serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
     ahrs.begin(ahrs_update_freq);
+    is_imu_initialized = true;
+
 
     blinkLED_switch = true;
 }
@@ -108,7 +111,13 @@ void defaultLoop(void) {
 
 
 	while(true) {
-		serial << "Accel: " << imu.read_accel_data().to_string() << stf::endl;
+//		serial << "Accel: " << imu.read_accel_data().to_string() << stf::endl;
+//		serial << "Gyro: " << imu.read_gyro_data().to_string() << stf::endl;
+//		serial << "Yaw: " << (int)ahrs.getYaw() << stf::endl; // not working
+//		serial << "Pitch: " << (int)ahrs.getPitch() << stf::endl;
+//		serial << "Roll: " << (int)ahrs.getRoll() << stf::endl;
+		// serial << "Magnetometer: " << imu.read_compass_data().to_string() << stf::endl;
+
 	}
 
 
@@ -139,17 +148,18 @@ void updatePIDLoop(void) {
 }
 
 void updateIMULoop(void) {
-	if(is_imu_initialized) {
-		uint32_t update_period = (uint32_t) (1000.00f / ahrs_update_freq);
-		MPU6500_IST8310::data accel, gyro, mag;
-
-		accel = imu.read_accel_data();
-		gyro = imu.read_gyro_data();
-		mag = imu.read_compass_data();
-		ahrs.update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, mag.x, mag.y, mag.z);
-
-		delay(update_period);
-	}
+//	if(is_imu_initialized) {
+//		uint32_t update_period = (uint32_t) (1000.00f / ahrs_update_freq);
+//		MPU6500_IST8310::data accel, gyro, mag;
+//
+//		accel = imu.read_accel_data();
+//		gyro = imu.read_gyro_data();
+//		mag = imu.read_compass_data();
+//		ahrs.update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, mag.x, mag.y, mag.z);
+//
+//		delay(update_period);
+//	}
+	delay(1000);
 }
 
 // Allows for continuous output of motor info
@@ -165,31 +175,33 @@ void printInfoLoop(void) {
 //	serial << "[Torque: " << torque << "]" << stf::endl;
 
 	// float or double CANNOT be printed
-	serial << (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00 / 100.0) << "."
-			<< (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00) % 100 << stf::endl;
+//	serial << (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00 / 100.0) << "."
+//			<< (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00) % 100 << stf::endl;
+	delay(1000);
 
 }
 
 void sensorsLoop(void) {
-
+	delay(1000);
 }
 
 void actuatorsLoop(void) {
-
+	delay(1000);
 }
 
 void usbReadLoop(void){
-
+	delay(1000);
 }
 
 void usbWriteLoop(void){
-	while(true){
-		//std::string test_string = usb.read_line();
-		std::string space = "GME to Pluto\n";
-		// usb.send_packet(test_string.append(space));
-        usb.send_packet(space);
-
-	}
+//	while(true){
+//		//std::string test_string = usb.read_line();
+////		std::string space = "GME to Pluto\n";
+////		// usb.send_packet(test_string.append(space));
+////        usb.send_packet(space);
+//
+//	}
+	delay(1000);
 }
 
 

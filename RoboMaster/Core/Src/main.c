@@ -83,7 +83,7 @@ const osThreadAttr_t UpdatePIDTask_attributes = {
   .stack_size = sizeof(myTask03Buffer),
   .cb_mem = &myTask03ControlBlock,
   .cb_size = sizeof(myTask03ControlBlock),
-  .priority = (osPriority_t) osPriorityHigh,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for PrintInfo */
 osThreadId_t PrintInfoHandle;
@@ -147,7 +147,7 @@ const osThreadAttr_t SensorsTask_attributes = {
 };
 /* Definitions for UpdateIMUTask */
 osThreadId_t UpdateIMUTaskHandle;
-uint32_t UpdateIMUTaskBuffer[ 512 ];
+uint32_t UpdateIMUTaskBuffer[ 1024 ];
 osStaticThreadDef_t UpdateIMUTaskControlBlock;
 const osThreadAttr_t UpdateIMUTask_attributes = {
   .name = "UpdateIMUTask",
@@ -155,7 +155,7 @@ const osThreadAttr_t UpdateIMUTask_attributes = {
   .stack_size = sizeof(UpdateIMUTaskBuffer),
   .cb_mem = &UpdateIMUTaskControlBlock,
   .cb_size = sizeof(UpdateIMUTaskControlBlock),
-  .priority = (osPriority_t) osPriorityHigh,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* USER CODE BEGIN PV */
 
