@@ -68,6 +68,7 @@ void setup(void) {
 	pwm_signal.pwm_generation_begin(Channel2);
 
 	usb.init();
+	usb.send_packet("Hi\n\r");
 
     byte_t id = imu.init(ist8310_reset);
     imu.calibrate();
@@ -110,7 +111,7 @@ void defaultLoop(void) {
 //	}
 
 
-	while(true) {
+//	while(true) {
 //		serial << "Accel: " << imu.read_accel_data().to_string() << stf::endl;
 //		serial << "Gyro: " << imu.read_gyro_data().to_string() << stf::endl;
 //		serial << "Yaw: " << (int)ahrs.getYaw() << stf::endl; // not working
@@ -118,7 +119,7 @@ void defaultLoop(void) {
 //		serial << "Roll: " << (int)ahrs.getRoll() << stf::endl;
 		// serial << "Magnetometer: " << imu.read_compass_data().to_string() << stf::endl;
 
-	}
+//	}
 
 
     while(true) { // do nothing
@@ -141,10 +142,11 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-	if (is_motor_initialized) {
-		motors.pid_update_motor_currents();
-		delay(motors.get_ctrl_period_ms());
-	}
+//	if (is_motor_initialized) {
+//		motors.pid_update_motor_currents();
+//		delay(motors.get_ctrl_period_ms());
+//	}
+	delay(1000);
 }
 
 void updateIMULoop(void) {
@@ -190,18 +192,33 @@ void actuatorsLoop(void) {
 }
 
 void usbReadLoop(void){
+
+	while(true){
+		// usb.send_packet("xxxxxxxxx\n");
+		std::string test_string = usb.read_line();
+//		std::string test_string = "Testing write loop";
+		std::string space = "\n\r";
+		usb.send_packet(test_string.append(space));
+
+	}
+
 	delay(1000);
 }
 
+// Write from RoboMaster to RP4
 void usbWriteLoop(void){
+
 //	while(true){
-//		//std::string test_string = usb.read_line();
-////		std::string space = "GME to Pluto\n";
-////		// usb.send_packet(test_string.append(space));
-////        usb.send_packet(space);
+//		std::string test_string = usb.read_line();
+////		std::string test_string = "noodles";
+////		std::string test_string = "Testing write loop";
+//		std::string space = "\n";
+//		usb.send_packet(test_string.append(space));
+//        // usb.send_packet(space);
 //
 //	}
 	delay(1000);
+
 }
 
 

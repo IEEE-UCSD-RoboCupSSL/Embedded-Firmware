@@ -99,27 +99,22 @@ const osThreadAttr_t PrintInfo_attributes = {
 };
 /* Definitions for UsbReadTask */
 osThreadId_t UsbReadTaskHandle;
-uint32_t usbReadTaskBuffer[ 512 ];
-osStaticThreadDef_t usbReadTaskControlBlock;
+uint32_t UsbReadTaskBuffer[ 1024 ];
+osStaticThreadDef_t UsbReadTaskControlBlock;
 const osThreadAttr_t UsbReadTask_attributes = {
   .name = "UsbReadTask",
-  .stack_mem = &usbReadTaskBuffer[0],
-  .stack_size = sizeof(usbReadTaskBuffer),
-  .cb_mem = &usbReadTaskControlBlock,
-  .cb_size = sizeof(usbReadTaskControlBlock),
+  .stack_mem = &UsbReadTaskBuffer[0],
+  .stack_size = sizeof(UsbReadTaskBuffer),
+  .cb_mem = &UsbReadTaskControlBlock,
+  .cb_size = sizeof(UsbReadTaskControlBlock),
   .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for UsbWriteTask */
 osThreadId_t UsbWriteTaskHandle;
-uint32_t usbWriteTaskBuffer[ 512 ];
-osStaticThreadDef_t usbWriteTaskControlBlock;
 const osThreadAttr_t UsbWriteTask_attributes = {
   .name = "UsbWriteTask",
-  .stack_mem = &usbWriteTaskBuffer[0],
-  .stack_size = sizeof(usbWriteTaskBuffer),
-  .cb_mem = &usbWriteTaskControlBlock,
-  .cb_size = sizeof(usbWriteTaskControlBlock),
   .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
 };
 /* Definitions for ActuatorsTask */
 osThreadId_t ActuatorsTaskHandle;
