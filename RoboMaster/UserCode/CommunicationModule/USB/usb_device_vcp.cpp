@@ -49,7 +49,8 @@ std::string& USB_VCP::read_some() {
 	size_t num_bytes_received;
 	do {
 		num_bytes_received = xMessageBufferReceive(msg_buf,
-				(void*)rx_msg_buf, sizeof(rx_msg_buf) , 300);
+				(void*)rx_msg_buf, 64 , 300);
+
 	} while(num_bytes_received <= 0);
 
 	some_str = std::string((const char*)rx_msg_buf, num_bytes_received);
@@ -57,38 +58,38 @@ std::string& USB_VCP::read_some() {
 
 }
 
-//std::string USB_VCP::read_line(char delim) {
-//	std::string str;
-//	size_t length;
-//	while(1){
-//		str = read_some();
-////		str = "Testing\r read_line";
-//
-//		length = str.find(delim);
-//
-//		if(length == std::string::npos){
-//			continue;
-//		}
-//
-//		line_str = str.substr(0, length);
-//		break;
-//	}
-//
-//
-////    std::getline(rx_ss, line_str, '\n');
-//	return line_str;
-//
-//}
-
 std::string USB_VCP::read_line(char delim) {
 	std::string str;
-	do {
+	size_t length;
+	while(1){
 		str = read_some();
-		rx_ss << str;
-	} while(str.find(delim) == std::string::npos); // if delimiter not found, keep read_some()
-    std::getline(rx_ss, line_str, delim);
+//		str = "Testing\r read_line";
+
+		length = str.find(delim);
+
+		if(length == std::string::npos){
+			continue;
+		}
+
+		line_str = str.substr(0, length);
+		break;
+	}
+
+
+//    std::getline(rx_ss, line_str, '\n');
 	return line_str;
+
 }
+
+//std::string USB_VCP::read_line(char delim) {
+//	std::string str;
+//	do {
+//		str = read_some();
+//		rx_ss << str;
+//	} while(str.find(delim) == std::string::npos); // if delimiter not found, keep read_some()
+//    std::getline(rx_ss, line_str, delim);
+//	return line_str;
+//}
 
 // char* USB_VCP::read_bytes() {
 // 	size_t num_bytes_received;

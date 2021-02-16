@@ -3,6 +3,8 @@
 #include "Motor/dji_m2006_motor.hpp"
 #include "IMU/mpu6500_ist8310.hpp"
 #include "IMU/Adafruit_AHRS_Mahony.h"
+#include "FreeRTOS.h"
+#include "queue.h"
 
 #include <iostream>
 #include <vector>
@@ -53,22 +55,40 @@ bool blinkLED_switch = true;
 
 bool is_motor_initialized = false;
 bool is_imu_initialized = false;
+bool is_usb_initialized = false;
+
+QueueHandle_t io_message_queue;
+bool is_message_queue_initialized = false;
+
 
 void setup(void) {
     blinkLED_switch = false;
     serial << "=========================================================" << stf::endl;
-    serial << "Hello World" << stf::endl;
+//    serial << "Hello World" << stf::endl;
     
+
+
     motor_power_switch_01.write(High);
     motor_power_switch_02.write(High);
     motor_power_switch_03.write(High);
     motor_power_switch_04.write(High);
 
+    serial << "Before motor init" << stf::endl;
+	motors.init();
+	is_motor_initialized = true;
+	serial << "After Motor init " << stf::endl;
+
 	pwm_signal.init_pwm_generation(1000, 1000);
 	pwm_signal.pwm_generation_begin(Channel2);
 
+
+
+	io_message_queue = xQueueCreate(1, 64);
+	is_message_queue_initialized = true;
+
 	usb.init();
-	usb.send_packet("Hi\n\r");
+	//usb.send_packet("Hi\n\r");
+	is_usb_initialized = true;
 
     byte_t id = imu.init(ist8310_reset);
     imu.calibrate();
@@ -82,9 +102,7 @@ void setup(void) {
 
 void defaultLoop(void) {
 
-//	motors.init();
-//
-//	is_motor_init = true;
+//	if(!is_motor_initialized) return;
 //
 //    // wait until white button is pressed to proceed, for safety reasons
 //	while(button.read() == Low){
@@ -93,17 +111,18 @@ void defaultLoop(void) {
 //
 //    // motors.motor_test(DjiRM::Motor2);
 //	while(true){
-////		motors.set_velocity(10, 10, 10, 10);
+//		motors.set_velocity(10, 10, 10, 10);
 ////		delay(2000);
 ////		motors.set_velocity(25, 25, 25, 25);
 ////		delay(2000);
-//		motors.set_velocity(50, 50, 50, 50);
+////		motors.set_velocity(50, 50, 50, 50);
 //		delay(2000);
 ////		motors.set_velocity(100, 100, 100, 100);
-//		delay(2000);
-//
 //	}
-
+//
+//	while(true){
+//		motors.set_current(1000, 1000, 1000, 1000);
+//	}
 
 	// pwm_signal.set_pwm_duty_cycle_cnt(Channel1, 50);
 //	while (true) {
@@ -122,9 +141,11 @@ void defaultLoop(void) {
 //	}
 
 
-    while(true) { // do nothing
-    	delay(1000);
-    }
+
+
+//    while(true) { // do nothing
+//    	delay(1000);
+//    }
 }
 
 
@@ -142,11 +163,10 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-//	if (is_motor_initialized) {
-//		motors.pid_update_motor_currents();
-//		delay(motors.get_ctrl_period_ms());
-//	}
-	delay(1000);
+	if (is_motor_initialized) {
+		motors.pid_update_motor_currents();
+		delay(motors.get_ctrl_period_ms());
+	}
 }
 
 void updateIMULoop(void) {
@@ -188,35 +208,69 @@ void sensorsLoop(void) {
 }
 
 void actuatorsLoop(void) {
+	if(is_message_queue_initialized && is_usb_initialized){
+		char cmd[64];
+		int length;
+		std::string cmd_str = "NO";
+
+		// wait until white button is pressed to proceed, for safety reasons
+		while(button.read() == Low){
+			motors.set_current(0, 0, 0, 0);
+		}
+
+		xQueuePeek(io_message_queue, cmd, 0);
+
+		length = strlen(cmd);
+
+		cmd_str = std::string((const char*) cmd, length);
+
+		// motors.motor_test(DjiRM::Motor2);
+		while(cmd_str.compare("YES") == 0){
+			motors.set_velocity(10, 10, 10, 10);
+	//		delay(2000);
+	//		motors.set_velocity(25, 25, 25, 25);
+	//		delay(2000);
+//			motors.set_velocity(50, 50, 50, 50);
+	//		motors.set_velocity(100, 100, 100, 100);
+
+			xQueuePeek(io_message_queue, cmd, 0);
+			length = strlen(cmd);
+			cmd_str = std::string((const char*) cmd, length);
+			delay(1000);
+		}
+
+		motors.stop();
+		motors.set_current(0, 0, 0, 0);
+	}
 	delay(1000);
 }
 
 void usbReadLoop(void){
+	if(is_usb_initialized && is_message_queue_initialized) {
+		std::string line = usb.read_line('\n');
+//		usb.send_packet(line.append("\n"));
+		const char* line_cstring = line.c_str();
+//		std::string line = "Test";
 
-	while(true){
-		// usb.send_packet("xxxxxxxxx\n");
-		std::string test_string = usb.read_line();
-//		std::string test_string = "Testing write loop";
-		std::string space = "\n\r";
-		usb.send_packet(test_string.append(space));
-
+		xQueueOverwrite(io_message_queue, line_cstring);
 	}
-
-	delay(1000);
 }
 
 // Write from RoboMaster to RP4
 void usbWriteLoop(void){
-
-//	while(true){
-//		std::string test_string = usb.read_line();
-////		std::string test_string = "noodles";
-////		std::string test_string = "Testing write loop";
-//		std::string space = "\n";
-//		usb.send_packet(test_string.append(space));
-//        // usb.send_packet(space);
+//	if(is_usb_initialized && is_message_queue_initialized){
+//		char cmd[64];
+//		int length;
 //
+//		xQueueReceive(io_message_queue, cmd, 300);
+//
+//		length = strlen(cmd);
+//
+//		std::string cmd_str = std::string((const char*) cmd, length);
+//
+//		usb.send_packet(cmd_str.append("\n"));
 //	}
+
 	delay(1000);
 
 }

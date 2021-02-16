@@ -17,7 +17,7 @@
 #include <iostream>
 
 #define PACKET_SIZE 64 // 64 bytes is the default packet size for USB2.0 FS
-#define RX_MSG_BUF_SIZE 100 // bytes
+#define RX_MSG_BUF_SIZE 64 // bytes
 
 /* This is not a complete library class that deals with much more edge cases,
  * but it can be upgraded to be like one of the stm32-thalamus-framework(stf)
