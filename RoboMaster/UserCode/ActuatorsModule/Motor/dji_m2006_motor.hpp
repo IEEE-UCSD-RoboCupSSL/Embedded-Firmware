@@ -4,6 +4,8 @@
 #include "stf.h"
 #include "pid.hpp"
 
+#include <string>
+
 
 namespace DjiRM {
     enum motor_id : int {
@@ -13,6 +15,22 @@ namespace DjiRM {
         Motor4 = 3
     };
 }
+
+struct Wheel_speeds_t{
+	float RF;
+	float RB;
+	float LB;
+	float LF;
+};
+typedef struct Wheel_speeds_t Wheel_speeds;
+
+struct Parsed_cmd_t{
+	float x;
+	float y;
+	float omega;
+};
+typedef struct Parsed_cmd_t Parsed_cmd;
+
 
 namespace DjiRM {
     /* Only utilizing the OOP conventions, in fact for simplicity,
@@ -71,6 +89,45 @@ namespace DjiRM {
         void set_current(int16_t ESC1_Curr, int16_t ESC2_Curr, int16_t ESC3_Curr, int16_t ESC4_Curr);
 
         void stop(void);
+
+        static Wheel_speeds bw_transformation(float vx, float vy, float ang_vel) {
+        	// TBD from Mechacnical Team
+        	float phi = 26.66;
+        	float theta = 26.66;
+        	float R = 1;
+        	Wheel_speeds ws;
+
+        	ws.RF = (vy*std::cos(phi) - vx*std::sin(phi) + ang_vel*R) ;
+        	ws.RB = (vy*std::cos(theta) + vx*std::sin(theta) + ang_vel*R) ;
+        	ws.LB = (-vy*std::cos(theta) + vx*std::sin(theta) + ang_vel*R) ;
+        	ws.LF = (-vy*std::cos(phi) - vx*std::sin(phi) + ang_vel*R) ;
+
+        	return ws;
+        }
+
+        static Parsed_cmd parse_cmd(std::string cmd_str){
+    		Parsed_cmd parsed_cmd;
+    		int firstDelim;
+    		int sndDelim;
+    		int stringlen = cmd_str.length();
+    		std::string my_str2;
+
+    		parsed_cmd.x = 0;
+    		parsed_cmd.y = 0;
+    		parsed_cmd.omega = 0;
+
+        	firstDelim = cmd_str.find(',');
+        	if(firstDelim == stringlen){
+        		return parsed_cmd;
+        	}
+			parsed_cmd.x = std::stof(cmd_str.substr(0, firstDelim));
+			my_str2 = cmd_str.substr(firstDelim + 1, std::string::npos);
+			sndDelim = my_str2.find(',');
+			parsed_cmd.y= std::stof(my_str2.substr(0, sndDelim));
+			parsed_cmd.omega = std::stof(my_str2.substr(sndDelim+1, std::string::npos));
+
+			return parsed_cmd;
+        }
 
         uint16_t get_raw_angle(motor_id m_id);
         int16_t get_raw_speed(motor_id m_id);

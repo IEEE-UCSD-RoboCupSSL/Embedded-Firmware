@@ -73,10 +73,10 @@ void setup(void) {
     motor_power_switch_03.write(High);
     motor_power_switch_04.write(High);
 
-    serial << "Before motor init" << stf::endl;
+//    serial << "Before motor init" << stf::endl;
 	motors.init();
 	is_motor_initialized = true;
-	serial << "After Motor init " << stf::endl;
+//	serial << "After Motor init " << stf::endl;
 
 	pwm_signal.init_pwm_generation(1000, 1000);
 	pwm_signal.pwm_generation_begin(Channel2);
@@ -208,25 +208,34 @@ void sensorsLoop(void) {
 }
 
 void actuatorsLoop(void) {
-	if(is_message_queue_initialized && is_usb_initialized){
+	if(is_message_queue_initialized && is_usb_initialized && is_motor_initialized){
 		char cmd[64];
 		int length;
-		std::string cmd_str = "NO";
+		std::string cmd_str = "0,0,0";
+		Parsed_cmd parsed_cmd;
+		Wheel_speeds ws;
+
+		memset(cmd, 64, sizeof(char));
+
+		parsed_cmd.x = 0;
+		parsed_cmd.y = 0;
+		parsed_cmd.omega = 0;
+
+		ws.RF = 0;
+		ws.RB = 0;
+		ws.LF = 0;
+		ws.LB = 0;
 
 		// wait until white button is pressed to proceed, for safety reasons
 		while(button.read() == Low){
 			motors.set_current(0, 0, 0, 0);
 		}
 
-		xQueuePeek(io_message_queue, cmd, 0);
-
-		length = strlen(cmd);
-
-		cmd_str = std::string((const char*) cmd, length);
 
 		// motors.motor_test(DjiRM::Motor2);
-		while(cmd_str.compare("YES") == 0){
-			motors.set_velocity(10, 10, 10, 10);
+		while(1){
+			// Mapping: RF, RB, LB, LF
+			motors.set_velocity(ws.RF, ws.RB, ws.LB, ws.LF);
 	//		delay(2000);
 	//		motors.set_velocity(25, 25, 25, 25);
 	//		delay(2000);
@@ -235,7 +244,16 @@ void actuatorsLoop(void) {
 
 			xQueuePeek(io_message_queue, cmd, 0);
 			length = strlen(cmd);
+
+			if(length < 4) continue;
+
 			cmd_str = std::string((const char*) cmd, length);
+//
+			parsed_cmd = DjiRM::M2006_Motor::parse_cmd(cmd_str);
+
+			ws = DjiRM::M2006_Motor::bw_transformation(parsed_cmd.x, parsed_cmd.y, parsed_cmd.omega);
+
+
 			delay(1000);
 		}
 
