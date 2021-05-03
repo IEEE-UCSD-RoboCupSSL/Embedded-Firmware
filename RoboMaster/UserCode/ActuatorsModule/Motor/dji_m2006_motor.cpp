@@ -22,11 +22,7 @@ static const uint32_t motor4_can_id = 0x204;
 static volatile uint8_t motor_idx;
 static volatile uint16_t angle_data[4];
 static volatile int16_t speed_data[4];
-static volatile int16_t torque_data[4];
-
-
-
-
+static volatile float current_data[4];
 
 void M2006_Motor::init(void) {
     __hcanx = hcanx;
@@ -113,8 +109,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         if(rx_header.StdId == motor4_can_id) motor_idx = 3;
 
         angle_data[motor_idx] = (uint16_t)(rx_data[0]<<8 | rx_data[1]);
-        speed_data[motor_idx] = (int16_t)(rx_data[2]<<8 | rx_data[3]);
-        torque_data[motor_idx] = (int16_t)(rx_data[4]<<8 | rx_data[5]);
+        speed_data[motor_idx] = (int16_t)(rx_data[2]<<8 | rx_data[3]); // originally rpm
+        current_data[motor_idx] = (rx_data[4]<<8 | rx_data[5])*5.f/16384.f;
     }
 }
 
@@ -125,8 +121,8 @@ uint16_t M2006_Motor::get_raw_angle(motor_id m_id) {
 int16_t M2006_Motor::get_raw_speed(motor_id m_id) {
     return speed_data[m_id];
 }
-int16_t M2006_Motor::get_raw_torque(motor_id m_id) {
-    return torque_data[m_id];
+float M2006_Motor::get_raw_current(motor_id m_id) {
+    return current_data[m_id];
 }
 
 // make velocity unit-less (%)

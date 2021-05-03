@@ -363,10 +363,12 @@ byte_t MPU6500_IST8310::init(void) {
     mpu_master_i2c_auto_read_config(IST8310_ADDRESS, IST8310_R_XL, 0x06);
     delay(10);
 
-    measure_offset();
+//    offset = measure_offset(0);
+//    serial << "Offset: " << (float)offset << stf::endl;
 
     return id;
 }
+
 
 void MPU6500_IST8310::collect_accel_data(void) {
     accel_x = read_reg(MPU6500_ACCEL_XOUT_H) << 8 | read_reg(MPU6500_ACCEL_XOUT_L);
@@ -393,7 +395,6 @@ void MPU6500_IST8310::collect_compass_data(void) {
     mag_z = read_reg(MPU6500_EXT_SENS_DATA_04) << 8 | read_reg(MPU6500_EXT_SENS_DATA_05);
     mag_x -= mag_x_offset; mag_y -= mag_y_offset; mag_z -= mag_z_offset;
 }
-
 
 
 
@@ -469,6 +470,14 @@ MPU6500_IST8310::data MPU6500_IST8310::read_compass_data(void) {
 	d.y = this->mag_y;
 	d.z = this->mag_z;
 	return d;
+}
+
+double MPU6500_IST8310::read_compass_angle(void) {
+	collect_compass_data();
+	double angle, degrees;
+	angle = atan2(mag_y,  mag_x);
+	degrees = angle*180.00 / 3.14159265;
+	return degrees ;
 }
 
 double MPU6500_IST8310::read_temp_data(void) {

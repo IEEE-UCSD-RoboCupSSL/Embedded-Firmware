@@ -90,6 +90,7 @@ public:
     data read_accel_data(void);
     data read_gyro_data(void);
     data read_compass_data(void);
+    double read_compass_angle(void);
     double read_temp_data(void);
 
 

@@ -53,19 +53,14 @@ GPIO ist8310_reset(IST8310_Reset_GPIO_Port, IST8310_Reset_Pin);
 
 bool blinkLED_switch = true;
 
-bool is_motor_initialized = false;
-bool is_imu_initialized = false;
-bool is_usb_initialized = false;
+bool has_setup = false;
 
 QueueHandle_t io_message_queue;
-bool is_message_queue_initialized = false;
 
 
 void setup(void) {
     blinkLED_switch = false;
     serial << "=========================================================" << stf::endl;
-//    serial << "Hello World" << stf::endl;
-    
 
 
     motor_power_switch_01.write(High);
@@ -75,7 +70,6 @@ void setup(void) {
 
 //    serial << "Before motor init" << stf::endl;
 	motors.init();
-	is_motor_initialized = true;
 //	serial << "After Motor init " << stf::endl;
 
 	pwm_signal.init_pwm_generation(1000, 1000);
@@ -84,44 +78,44 @@ void setup(void) {
 
 
 	io_message_queue = xQueueCreate(1, 64);
-	is_message_queue_initialized = true;
 
 	usb.init();
 	//usb.send_packet("Hi\n\r");
-	is_usb_initialized = true;
 
     byte_t id = imu.init(ist8310_reset);
     imu.calibrate();
     serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
     ahrs.begin(ahrs_update_freq);
-    is_imu_initialized = true;
 
 
     blinkLED_switch = true;
+    has_setup = true;
 }
 
 void defaultLoop(void) {
 
-//	if(!is_motor_initialized) return;
+	if(!has_setup) return;
 //
-//    // wait until white button is pressed to proceed, for safety reasons
-//	while(button.read() == Low){
-//		motors.set_current(0, 0, 0, 0);
-//	}
+    // wait until white button is pressed to proceed, for safety reasons
+	while(button.read() == Low){
+		motors.set_current(0, 0, 0, 0);
+	}
 //
 //    // motors.motor_test(DjiRM::Motor2);
 //	while(true){
-//		motors.set_velocity(10, 10, 10, 10);
-////		delay(2000);
-////		motors.set_velocity(25, 25, 25, 25);
-////		delay(2000);
-////		motors.set_velocity(50, 50, 50, 50);
+////		motors.set_velocity(10, 10, 10, 10);
+//////		delay(2000);
+//		motors.set_velocity(25, 25, 25, 25);
 //		delay(2000);
-////		motors.set_velocity(100, 100, 100, 100);
+//////		motors.set_velocity(50, 50, 50, 50);
+////		delay(2000);
+//////		motors.set_velocity(100, 100, 100, 100);
 //	}
-//
+
+// Check if motor runs
 //	while(true){
-//		motors.set_current(1000, 1000, 1000, 1000);
+//		motors.set_current(500, 500, 500, 500);
+//		delay(100);
 //	}
 
 	// pwm_signal.set_pwm_duty_cycle_cnt(Channel1, 50);
@@ -130,16 +124,16 @@ void defaultLoop(void) {
 //	}
 
 
-//	while(true) {
+	while(true) {
 //		serial << "Accel: " << imu.read_accel_data().to_string() << stf::endl;
 //		serial << "Gyro: " << imu.read_gyro_data().to_string() << stf::endl;
-//		serial << "Yaw: " << (int)ahrs.getYaw() << stf::endl; // not working
+//		serial << "Magnetometer: " << imu.read_compass_data().to_string() << stf::endl;
+		serial << "Angle: " << imu.read_compass_angle() << stf::endl;
+//		serial << "Yaw: " << (float)ahrs.getYawRadians() << stf::endl; // not working/
 //		serial << "Pitch: " << (int)ahrs.getPitch() << stf::endl;
 //		serial << "Roll: " << (int)ahrs.getRoll() << stf::endl;
-		// serial << "Magnetometer: " << imu.read_compass_data().to_string() << stf::endl;
-
-//	}
-
+		delay(100);
+	}
 
 
 
@@ -163,44 +157,66 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-	if (is_motor_initialized) {
-		motors.pid_update_motor_currents();
-		delay(motors.get_ctrl_period_ms());
-	}
+//	if (has_setup) {
+//		motors.pid_update_motor_currents();
+//		delay(motors.get_ctrl_period_ms());
+//	}
 }
 
 void updateIMULoop(void) {
-//	if(is_imu_initialized) {
-//		uint32_t update_period = (uint32_t) (1000.00f / ahrs_update_freq);
-//		MPU6500_IST8310::data accel, gyro, mag;
-//
-//		accel = imu.read_accel_data();
-//		gyro = imu.read_gyro_data();
-//		mag = imu.read_compass_data();
+	if(has_setup) {
+		uint32_t update_period = (uint32_t) (1000.00f / ahrs_update_freq);
+		MPU6500_IST8310::data accel, gyro, mag;
+
+		accel = imu.read_accel_data();
+		gyro = imu.read_gyro_data();
+		mag = imu.read_compass_data();
+
 //		ahrs.update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, mag.x, mag.y, mag.z);
+
+
+//		while(true) {
+////			serial << "Accel: " << imu.read_accel_data().to_string() << stf::endl;
+////			serial << "Gyro: " << imu.read_gyro_data().to_string() << stf::endl;
+//			serial << "Yaw: " << (int)ahrs.getYaw() << stf::endl; // not working
+//			serial << "Pitch: " << (int)ahrs.getPitch() << stf::endl;
+//			serial << "Roll: " << (int)ahrs.getRoll() << stf::endl;
+////			serial << "Magnetometer: " << imu.read_compass_data().to_string() << stf::endl;
 //
-//		delay(update_period);
-//	}
-	delay(1000);
+//		}
+
+
+		delay(update_period);
+	}
+	else { delay(1000); }
+//	delay(1000);
 }
 
 // Allows for continuous output of motor info
 void printInfoLoop(void) {
-//    int16_t speed, torque;
-//    uint16_t angle;
-//	// serial << "Motor on" << stf::endl;
-//	angle = motors.get_raw_angle(DjiRM::Motor2);
-//	speed = motors.get_raw_speed(DjiRM::Motor2);
-//	torque = motors.get_raw_torque(DjiRM::Motor2);
-//	serial << "[Angle : " << angle  << "]";
-//	serial << "[Speed : " << speed  << "]";
-//	serial << "[Torque: " << torque << "]" << stf::endl;
-
-	// float or double CANNOT be printed
-//	serial << (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00 / 100.0) << "."
-//			<< (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00) % 100 << stf::endl;
+//	int16_t speed;
+//	float current;
+//	uint16_t angle;
+//
+//	if (has_setup) {
+//	//	// serial << "Motor on" << stf::endl;
+//		angle = motors.get_raw_angle(DjiRM::Motor2);
+//		speed = motors.get_raw_speed(DjiRM::Motor2);
+//		current = motors.get_raw_current(DjiRM::Motor2);
+//		serial << "[Angle : " << angle  << "]";
+//		serial << "[Speed : " << speed  << "]";
+//		serial << "[Current: " << current << "]";
+//		serial << "[Time stamp: " << millis() << "]" << stf::endl;
+//
+//		// float or double CANNOT be printed
+//	//	serial << (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00 / 100.0) << "."
+//	//			<< (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00) % 100 << stf::endl;
+//		delay(10); // 1000 = 1sec
+//	}
+//	else {
+//		delay(1000);
+//	}
 	delay(1000);
-
 }
 
 void sensorsLoop(void) {
@@ -208,75 +224,76 @@ void sensorsLoop(void) {
 }
 
 void actuatorsLoop(void) {
-	if(is_message_queue_initialized && is_usb_initialized && is_motor_initialized){
-		char cmd[64];
-		int length;
-		std::string cmd_str = "0,0,0";
-		Parsed_cmd parsed_cmd;
-		Wheel_speeds ws;
-
-		memset(cmd, 64, sizeof(char));
-
-		parsed_cmd.x = 0;
-		parsed_cmd.y = 0;
-		parsed_cmd.omega = 0;
-
-		ws.RF = 0;
-		ws.RB = 0;
-		ws.LF = 0;
-		ws.LB = 0;
-
-		// wait until white button is pressed to proceed, for safety reasons
-		while(button.read() == Low){
-			motors.set_current(0, 0, 0, 0);
-		}
-
-
-		// motors.motor_test(DjiRM::Motor2);
-		while(1){
-			// Mapping: RF, RB, LB, LF
-			motors.set_velocity(ws.RF, ws.RB, ws.LB, ws.LF);
-	//		delay(2000);
-	//		motors.set_velocity(25, 25, 25, 25);
-	//		delay(2000);
-//			motors.set_velocity(50, 50, 50, 50);
-	//		motors.set_velocity(100, 100, 100, 100);
-
-			xQueuePeek(io_message_queue, cmd, 0);
-			length = strlen(cmd);
-
-			if(length < 4) continue;
-
-			cmd_str = std::string((const char*) cmd, length);
+//	if(has_setup){
+//		char cmd[64];
+//		int length;
+//		std::string cmd_str = "0,0,0";
+//		Parsed_cmd parsed_cmd;
+//		Wheel_speeds ws;
 //
-			parsed_cmd = DjiRM::M2006_Motor::parse_cmd(cmd_str);
-
-			ws = DjiRM::M2006_Motor::bw_transformation(parsed_cmd.x, parsed_cmd.y, parsed_cmd.omega);
-
-
-			delay(1000);
-		}
-
-		motors.stop();
-		motors.set_current(0, 0, 0, 0);
-	}
+//		memset(cmd, 64, sizeof(char));
+//
+//		parsed_cmd.x = 0;
+//		parsed_cmd.y = 0;
+//		parsed_cmd.omega = 0;
+//
+//		ws.RF = 0;
+//		ws.RB = 0;
+//		ws.LF = 0;
+//		ws.LB = 0;
+//
+//		// wait until white button is pressed to proceed, for safety reasons
+//		while(button.read() == Low){
+//			motors.set_current(0, 0, 0, 0);
+//		}
+//
+//
+//		// motors.motor_test(DjiRM::Motor2);
+//		while(1){
+//			// Mapping: RF, RB, LB, LF
+//			motors.set_velocity(ws.RF, ws.RB, ws.LB, ws.LF);
+//	//		delay(2000);
+//	//		motors.set_velocity(25, 25, 25, 25);
+//	//		delay(2000);
+////			motors.set_velocity(50, 50, 50, 50);
+//	//		motors.set_velocity(100, 100, 100, 100);
+//
+//			xQueuePeek(io_message_queue, cmd, 0);
+//			length = strlen(cmd);
+//
+//			if(length < 4) continue;
+//
+//			cmd_str = std::string((const char*) cmd, length);
+////
+//			parsed_cmd = DjiRM::M2006_Motor::parse_cmd(cmd_str);
+//
+//			ws = DjiRM::M2006_Motor::bw_transformation(parsed_cmd.x, parsed_cmd.y, parsed_cmd.omega);
+//
+//
+//			delay(1000);
+//		}
+//
+//		motors.stop();
+//		motors.set_current(0, 0, 0, 0);
+//	}
 	delay(1000);
 }
 
 void usbReadLoop(void){
-	if(is_usb_initialized && is_message_queue_initialized) {
-		std::string line = usb.read_line('\n');
-//		usb.send_packet(line.append("\n"));
-		const char* line_cstring = line.c_str();
-//		std::string line = "Test";
-
-		xQueueOverwrite(io_message_queue, line_cstring);
-	}
+//	if(has_setup) {
+//		std::string line = usb.read_line('\n');
+////		usb.send_packet(line.append("\n"));
+//		const char* line_cstring = line.c_str();
+////		std::string line = "Test";
+//
+//		xQueueOverwrite(io_message_queue, line_cstring);
+//	}
+	delay(1000);
 }
 
 // Write from RoboMaster to RP4
 void usbWriteLoop(void){
-//	if(is_usb_initialized && is_message_queue_initialized){
+//	if(has_setup){
 //		char cmd[64];
 //		int length;
 //

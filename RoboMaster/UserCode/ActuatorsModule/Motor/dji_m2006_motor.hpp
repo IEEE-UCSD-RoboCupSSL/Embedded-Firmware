@@ -131,7 +131,7 @@ namespace DjiRM {
 
         uint16_t get_raw_angle(motor_id m_id);
         int16_t get_raw_speed(motor_id m_id);
-        int16_t get_raw_torque(motor_id m_id);
+        float get_raw_current(motor_id m_id);
         
         float get_velocity(motor_id m_id);
 
