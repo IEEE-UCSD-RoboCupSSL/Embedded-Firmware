@@ -61,6 +61,7 @@ QueueHandle_t io_message_queue;
 void setup(void) {
     blinkLED_switch = false;
     serial << "=========================================================" << stf::endl;
+    serial << "Program Started" << stf::endl;
 
 
     motor_power_switch_01.write(High);
@@ -77,15 +78,13 @@ void setup(void) {
 
 
 
-	io_message_queue = xQueueCreate(1, 64);
+	io_message_queue = xQueueCreate(3, 64);
 
 	usb.init();
-	//usb.send_packet("Hi\n\r");
 
     byte_t id = imu.init(ist8310_reset);
     imu.calibrate();
     serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
-    ahrs.begin(ahrs_update_freq);
 
 
     blinkLED_switch = true;
@@ -94,12 +93,18 @@ void setup(void) {
 
 void defaultLoop(void) {
 
-	if(!has_setup) return;
+//	if(!has_setup) return;
+
+//	while (true) {
+//		usbWriteLoop();
+//	}
+
+
 //
     // wait until white button is pressed to proceed, for safety reasons
-	while(button.read() == Low){
-		motors.set_current(0, 0, 0, 0);
-	}
+//	while(button.read() == Low){
+//		motors.set_current(0, 0, 0, 0);
+//	}
 //
 //    // motors.motor_test(DjiRM::Motor2);
 //	while(true){
@@ -124,19 +129,19 @@ void defaultLoop(void) {
 //	}
 
 
-	while(true) {
+//	while(true) {
 //		serial << "Accel: " << imu.read_accel_data().to_string() << stf::endl;
 //		serial << "Gyro: " << imu.read_gyro_data().to_string() << stf::endl;
 //		serial << "Magnetometer: " << imu.read_compass_data().to_string() << stf::endl;
-		serial << "Angle: " << imu.read_compass_angle() << stf::endl;
+//		serial << "Angle: " << imu.read_compass_angle() << stf::endl;
 //		serial << "Yaw: " << (float)ahrs.getYawRadians() << stf::endl; // not working/
 //		serial << "Pitch: " << (int)ahrs.getPitch() << stf::endl;
 //		serial << "Roll: " << (int)ahrs.getRoll() << stf::endl;
-		delay(100);
-	}
+//		delay(100);
+//	}
 
 
-
+	delay(1000);
 //    while(true) { // do nothing
 //    	delay(1000);
 //    }
@@ -157,39 +162,41 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-//	if (has_setup) {
-//		motors.pid_update_motor_currents();
-//		delay(motors.get_ctrl_period_ms());
-//	}
+	if (has_setup) {
+		motors.pid_update_motor_currents();
+		delay(motors.get_ctrl_period_ms());
+	}
+
+	delay(1000);
 }
 
 void updateIMULoop(void) {
-	if(has_setup) {
-		uint32_t update_period = (uint32_t) (1000.00f / ahrs_update_freq);
-		MPU6500_IST8310::data accel, gyro, mag;
-
-		accel = imu.read_accel_data();
-		gyro = imu.read_gyro_data();
-		mag = imu.read_compass_data();
-
-//		ahrs.update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, mag.x, mag.y, mag.z);
-
-
-//		while(true) {
-////			serial << "Accel: " << imu.read_accel_data().to_string() << stf::endl;
-////			serial << "Gyro: " << imu.read_gyro_data().to_string() << stf::endl;
-//			serial << "Yaw: " << (int)ahrs.getYaw() << stf::endl; // not working
-//			serial << "Pitch: " << (int)ahrs.getPitch() << stf::endl;
-//			serial << "Roll: " << (int)ahrs.getRoll() << stf::endl;
-////			serial << "Magnetometer: " << imu.read_compass_data().to_string() << stf::endl;
+//	if(has_setup) {
+//		uint32_t update_period = (uint32_t) (1000.00f / ahrs_update_freq);
+//		MPU6500_IST8310::data accel, gyro, mag;
 //
-//		}
-
-
-		delay(update_period);
-	}
-	else { delay(1000); }
-//	delay(1000);
+//		accel = imu.read_accel_data();
+//		gyro = imu.read_gyro_data();
+//		mag = imu.read_compass_data();
+//
+////		ahrs.update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, mag.x, mag.y, mag.z);
+//
+//
+////		while(true) {
+//////			serial << "Accel: " << imu.read_accel_data().to_string() << stf::endl;
+//////			serial << "Gyro: " << imu.read_gyro_data().to_string() << stf::endl;
+////			serial << "Yaw: " << (int)ahrs.getYaw() << stf::endl; // not working
+////			serial << "Pitch: " << (int)ahrs.getPitch() << stf::endl;
+////			serial << "Roll: " << (int)ahrs.getRoll() << stf::endl;
+//////			serial << "Magnetometer: " << imu.read_compass_data().to_string() << stf::endl;
+////
+////		}
+//
+//
+//		delay(update_period);
+//	}
+//	else { delay(1000); }
+	delay(1000);
 }
 
 // Allows for continuous output of motor info
@@ -280,22 +287,36 @@ void actuatorsLoop(void) {
 }
 
 void usbReadLoop(void){
-//	if(has_setup) {
-//		std::string line = usb.read_line('\n');
-////		usb.send_packet(line.append("\n"));
-//		const char* line_cstring = line.c_str();
-////		std::string line = "Test";
-//
-//		xQueueOverwrite(io_message_queue, line_cstring);
+	if(has_setup) {
+		std::string line = usb.read_line('\n');
+//		usb.send_packet(line.append("\n"));
+		const char* line_cstring = line.c_str();
+//		std::string line = "Test";
+
+		///xQueueOverwrite(io_message_queue, line_cstring);
+
+		serial << line << stf::endl;
+	}
+
+//	while(true){
+//		std::string test_string = usb.read_line();
+//		std::string space = "GME to Pluto\n\r";
+//		usb.send_packet(test_string.append(space));
 //	}
 	delay(1000);
 }
 
 // Write from RoboMaster to RP4
 void usbWriteLoop(void){
-//	if(has_setup){
+	if(has_setup){
+
+		std::string space = "xxxxxx\n";
+		usb.send_packet(space);
+		delay(300);
+
 //		char cmd[64];
 //		int length;
+//
 //
 //		xQueueReceive(io_message_queue, cmd, 300);
 //
@@ -304,9 +325,18 @@ void usbWriteLoop(void){
 //		std::string cmd_str = std::string((const char*) cmd, length);
 //
 //		usb.send_packet(cmd_str.append("\n"));
-//	}
 
-	delay(1000);
+
+	}
+
+//	while(true){
+//		//std::string test_string = usb.read_line();
+//		std::string space = "GME to Pluto\n";
+//		// usb.send_packet(test_string.append(space));
+//        usb.send_packet(space);
+//
+//	}
+	//delay(1000);
 
 }
 

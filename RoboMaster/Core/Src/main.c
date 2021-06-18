@@ -6,13 +6,13 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                             www.st.com/SLA0044
   *
   ******************************************************************************
   */
@@ -58,8 +58,8 @@ UART_HandleTypeDef huart2;
 osThreadId_t DefaultTaskHandle;
 const osThreadAttr_t DefaultTask_attributes = {
   .name = "DefaultTask",
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
 };
 /* Definitions for BlinkLEDTask */
 osThreadId_t BlinkLEDTaskHandle;
@@ -67,10 +67,10 @@ uint32_t myTask02Buffer[ 128 ];
 osStaticThreadDef_t myTask02ControlBlock;
 const osThreadAttr_t BlinkLEDTask_attributes = {
   .name = "BlinkLEDTask",
-  .stack_mem = &myTask02Buffer[0],
-  .stack_size = sizeof(myTask02Buffer),
   .cb_mem = &myTask02ControlBlock,
   .cb_size = sizeof(myTask02ControlBlock),
+  .stack_mem = &myTask02Buffer[0],
+  .stack_size = sizeof(myTask02Buffer),
   .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for UpdatePIDTask */
@@ -79,10 +79,10 @@ uint32_t myTask03Buffer[ 512 ];
 osStaticThreadDef_t myTask03ControlBlock;
 const osThreadAttr_t UpdatePIDTask_attributes = {
   .name = "UpdatePIDTask",
-  .stack_mem = &myTask03Buffer[0],
-  .stack_size = sizeof(myTask03Buffer),
   .cb_mem = &myTask03ControlBlock,
   .cb_size = sizeof(myTask03ControlBlock),
+  .stack_mem = &myTask03Buffer[0],
+  .stack_size = sizeof(myTask03Buffer),
   .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for PrintInfo */
@@ -91,30 +91,11 @@ uint32_t printInfoBuffer[ 512 ];
 osStaticThreadDef_t printInfoControlBlock;
 const osThreadAttr_t PrintInfo_attributes = {
   .name = "PrintInfo",
-  .stack_mem = &printInfoBuffer[0],
-  .stack_size = sizeof(printInfoBuffer),
   .cb_mem = &printInfoControlBlock,
   .cb_size = sizeof(printInfoControlBlock),
+  .stack_mem = &printInfoBuffer[0],
+  .stack_size = sizeof(printInfoBuffer),
   .priority = (osPriority_t) osPriorityBelowNormal,
-};
-/* Definitions for UsbReadTask */
-osThreadId_t UsbReadTaskHandle;
-uint32_t UsbReadTaskBuffer[ 1024 ];
-osStaticThreadDef_t UsbReadTaskControlBlock;
-const osThreadAttr_t UsbReadTask_attributes = {
-  .name = "UsbReadTask",
-  .stack_mem = &UsbReadTaskBuffer[0],
-  .stack_size = sizeof(UsbReadTaskBuffer),
-  .cb_mem = &UsbReadTaskControlBlock,
-  .cb_size = sizeof(UsbReadTaskControlBlock),
-  .priority = (osPriority_t) osPriorityAboveNormal,
-};
-/* Definitions for UsbWriteTask */
-osThreadId_t UsbWriteTaskHandle;
-const osThreadAttr_t UsbWriteTask_attributes = {
-  .name = "UsbWriteTask",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
 };
 /* Definitions for ActuatorsTask */
 osThreadId_t ActuatorsTaskHandle;
@@ -122,10 +103,10 @@ uint32_t ActuatorsTaskBuffer[ 2048 ];
 osStaticThreadDef_t ActuatorsTaskControlBlock;
 const osThreadAttr_t ActuatorsTask_attributes = {
   .name = "ActuatorsTask",
-  .stack_mem = &ActuatorsTaskBuffer[0],
-  .stack_size = sizeof(ActuatorsTaskBuffer),
   .cb_mem = &ActuatorsTaskControlBlock,
   .cb_size = sizeof(ActuatorsTaskControlBlock),
+  .stack_mem = &ActuatorsTaskBuffer[0],
+  .stack_size = sizeof(ActuatorsTaskBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for SensorsTask */
@@ -134,10 +115,10 @@ uint32_t SensorsTaskBuffer[ 2048 ];
 osStaticThreadDef_t SensorsTaskControlBlock;
 const osThreadAttr_t SensorsTask_attributes = {
   .name = "SensorsTask",
-  .stack_mem = &SensorsTaskBuffer[0],
-  .stack_size = sizeof(SensorsTaskBuffer),
   .cb_mem = &SensorsTaskControlBlock,
   .cb_size = sizeof(SensorsTaskControlBlock),
+  .stack_mem = &SensorsTaskBuffer[0],
+  .stack_size = sizeof(SensorsTaskBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for UpdateIMUTask */
@@ -146,10 +127,10 @@ uint32_t UpdateIMUTaskBuffer[ 1024 ];
 osStaticThreadDef_t UpdateIMUTaskControlBlock;
 const osThreadAttr_t UpdateIMUTask_attributes = {
   .name = "UpdateIMUTask",
-  .stack_mem = &UpdateIMUTaskBuffer[0],
-  .stack_size = sizeof(UpdateIMUTaskBuffer),
   .cb_mem = &UpdateIMUTaskControlBlock,
   .cb_size = sizeof(UpdateIMUTaskControlBlock),
+  .stack_mem = &UpdateIMUTaskBuffer[0],
+  .stack_size = sizeof(UpdateIMUTaskBuffer),
   .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* USER CODE BEGIN PV */
@@ -169,24 +150,12 @@ void StartDefaultTask(void *argument);
 void StartBlinkLEDTask(void *argument);
 void StartUpdatePIDTask(void *argument);
 void StartPrintInfo(void *argument);
-void StartUsbReadTask(void *argument);
-void StartUsbWriteTask(void *argument);
 void StartActuatorsTask(void *argument);
 void StartSensorsTask(void *argument);
 void StartUpdateIMUTask(void *argument);
 
 /* USER CODE BEGIN PFP */
-extern void setup();
-extern void defaultLoop();
-extern void blinkLEDLoop();
-extern void updatePIDLoop();
-extern void updateIMULoop();
-extern void printInfoLoop();
-extern void pwmLoop();
-extern void sensorsLoop();
-extern void actuatorsLoop();
-extern void usbWriteLoop();
-extern void usbReadLoop();
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -263,12 +232,6 @@ int main(void)
 
   /* creation of PrintInfo */
   PrintInfoHandle = osThreadNew(StartPrintInfo, NULL, &PrintInfo_attributes);
-
-  /* creation of UsbReadTask */
-  UsbReadTaskHandle = osThreadNew(StartUsbReadTask, NULL, &UsbReadTask_attributes);
-
-  /* creation of UsbWriteTask */
-  UsbWriteTaskHandle = osThreadNew(StartUsbWriteTask, NULL, &UsbWriteTask_attributes);
 
   /* creation of ActuatorsTask */
   ActuatorsTaskHandle = osThreadNew(StartActuatorsTask, NULL, &ActuatorsTask_attributes);
@@ -662,7 +625,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the DefaultTask thread.
   * @param  argument: Not used
   * @retval None
   */
@@ -672,19 +635,17 @@ void StartDefaultTask(void *argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
-  setup();
   /* Infinite loop */
   for(;;)
   {
-	  defaultLoop();
-	  osDelay(1);
+    osDelay(1);
   }
   /* USER CODE END 5 */
 }
 
 /* USER CODE BEGIN Header_StartBlinkLEDTask */
 /**
-* @brief Function implementing the blinkLEDTask thread.
+* @brief Function implementing the BlinkLEDTask thread.
 * @param argument: Not used
 * @retval None
 */
@@ -695,8 +656,7 @@ void StartBlinkLEDTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  blinkLEDLoop();
-	  osDelay(1);
+    osDelay(1);
   }
   /* USER CODE END StartBlinkLEDTask */
 }
@@ -714,15 +674,14 @@ void StartUpdatePIDTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  updatePIDLoop();
-	  osDelay(1);
+    osDelay(1);
   }
   /* USER CODE END StartUpdatePIDTask */
 }
 
 /* USER CODE BEGIN Header_StartPrintInfo */
 /**
-* @brief Function implementing the printInfo thread.
+* @brief Function implementing the PrintInfo thread.
 * @param argument: Not used
 * @retval None
 */
@@ -733,48 +692,9 @@ void StartPrintInfo(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	printInfoLoop();
     osDelay(1);
   }
   /* USER CODE END StartPrintInfo */
-}
-
-/* USER CODE BEGIN Header_StartUsbReadTask */
-/**
-* @brief Function implementing the usbReadTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartUsbReadTask */
-void StartUsbReadTask(void *argument)
-{
-  /* USER CODE BEGIN StartUsbReadTask */
-  /* Infinite loop */
-  for(;;)
-  {
-	usbReadLoop();
-    osDelay(1);
-  }
-  /* USER CODE END StartUsbReadTask */
-}
-
-/* USER CODE BEGIN Header_StartUsbWriteTask */
-/**
-* @brief Function implementing the usbWriteTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartUsbWriteTask */
-void StartUsbWriteTask(void *argument)
-{
-  /* USER CODE BEGIN StartUsbWriteTask */
-  /* Infinite loop */
-  for(;;)
-  {
-	usbWriteLoop();
-    osDelay(1);
-  }
-  /* USER CODE END StartUsbWriteTask */
 }
 
 /* USER CODE BEGIN Header_StartActuatorsTask */
@@ -790,7 +710,6 @@ void StartActuatorsTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	actuatorsLoop();
     osDelay(1);
   }
   /* USER CODE END StartActuatorsTask */
@@ -809,7 +728,6 @@ void StartSensorsTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	sensorsLoop();
     osDelay(1);
   }
   /* USER CODE END StartSensorsTask */
@@ -828,7 +746,6 @@ void StartUpdateIMUTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	updateIMULoop();
     osDelay(1);
   }
   /* USER CODE END StartUpdateIMUTask */

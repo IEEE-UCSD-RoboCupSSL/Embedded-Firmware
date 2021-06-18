@@ -9,7 +9,7 @@ using namespace DjiRM;
 static const int16_t max_current = 9999; // 9.999A
 
 
-/* These should be declared as memeber variables in OOP design,
+/* These should be declared as member variables in OOP design,
  * but since interrupt is involved, there is a small complication to it,
  * i'm just being lazy and do this in C language's convention. 
  * There should be only one motor class instance anyways!

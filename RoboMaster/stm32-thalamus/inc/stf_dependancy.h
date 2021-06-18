@@ -37,6 +37,7 @@ extern "C" {
 
 
 #include "cmsis_os.h"
+#include "main.h"
 #include "arm_math.h"
 #include <cmath>
 

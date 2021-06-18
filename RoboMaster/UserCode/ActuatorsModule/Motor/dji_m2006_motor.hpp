@@ -2,7 +2,8 @@
 #define __DJI_M2006_MOTOR_H
 
 #include "stf.h"
-#include "pid.hpp"
+//#include "pid.hpp"
+#include "incremental_pid.hpp"
 
 #include <string>
 
@@ -53,10 +54,15 @@ namespace DjiRM {
          * can not reside or share variable within a class */
 
         float pid_ctrl_freq_Hz = 5000.00; // default 5000Hz
-        PID_Controller<float> m1_ctrl;
-		PID_Controller<float> m2_ctrl;
-		PID_Controller<float> m3_ctrl;
-		PID_Controller<float> m4_ctrl;
+//      PID_Controller<float> m1_ctrl;
+//		PID_Controller<float> m2_ctrl;
+//		PID_Controller<float> m3_ctrl;
+//		PID_Controller<float> m4_ctrl;
+
+        INC_PID_Controller<float> m1_ctrl;
+		INC_PID_Controller<float> m2_ctrl;
+		INC_PID_Controller<float> m3_ctrl;
+		INC_PID_Controller<float> m4_ctrl;
 
 		int16_t max_raw_speed = 19100;
 
@@ -89,21 +95,6 @@ namespace DjiRM {
         void set_current(int16_t ESC1_Curr, int16_t ESC2_Curr, int16_t ESC3_Curr, int16_t ESC4_Curr);
 
         void stop(void);
-
-        static Wheel_speeds bw_transformation(float vx, float vy, float ang_vel) {
-        	// TBD from Mechacnical Team
-        	float phi = 26.66;
-        	float theta = 26.66;
-        	float R = 1;
-        	Wheel_speeds ws;
-
-        	ws.RF = (vy*std::cos(phi) - vx*std::sin(phi) + ang_vel*R) ;
-        	ws.RB = (vy*std::cos(theta) + vx*std::sin(theta) + ang_vel*R) ;
-        	ws.LB = (-vy*std::cos(theta) + vx*std::sin(theta) + ang_vel*R) ;
-        	ws.LF = (-vy*std::cos(phi) - vx*std::sin(phi) + ang_vel*R) ;
-
-        	return ws;
-        }
 
         static Parsed_cmd parse_cmd(std::string cmd_str){
     		Parsed_cmd parsed_cmd;
