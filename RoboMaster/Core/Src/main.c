@@ -157,10 +157,19 @@ void StartUpdateIMUTask(void *argument);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
+extern void setup();
+extern void defaultLoop();
+extern void blinkLEDLoop();
+extern void updatePIDLoop();
+extern void updateIMULoop();
+extern void printInfoLoop();
+extern void sensorsLoop();
+extern void actuatorsLoop();
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint8_t *data = "Hello World from USB CDC\n";
+uint8_t buffer[64];
 /* USER CODE END 0 */
 
 /**
@@ -259,7 +268,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  CDC_Transmit_FS(data, strlen(data));
+	  HAL_Delay (1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -635,9 +645,11 @@ void StartDefaultTask(void *argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
+  setup();
   /* Infinite loop */
   for(;;)
   {
+	defaultLoop();
     osDelay(1);
   }
   /* USER CODE END 5 */
@@ -656,6 +668,7 @@ void StartBlinkLEDTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	blinkLEDLoop();
     osDelay(1);
   }
   /* USER CODE END StartBlinkLEDTask */
@@ -674,6 +687,7 @@ void StartUpdatePIDTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	updatePIDLoop();
     osDelay(1);
   }
   /* USER CODE END StartUpdatePIDTask */
@@ -692,6 +706,7 @@ void StartPrintInfo(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	printInfoLoop();
     osDelay(1);
   }
   /* USER CODE END StartPrintInfo */
@@ -710,6 +725,7 @@ void StartActuatorsTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	actuatorsLoop();
     osDelay(1);
   }
   /* USER CODE END StartActuatorsTask */
@@ -728,6 +744,7 @@ void StartSensorsTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	sensorsLoop();
     osDelay(1);
   }
   /* USER CODE END StartSensorsTask */
@@ -746,6 +763,7 @@ void StartUpdateIMUTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	updateIMULoop();
     osDelay(1);
   }
   /* USER CODE END StartUpdateIMUTask */

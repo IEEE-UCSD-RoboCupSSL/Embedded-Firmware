@@ -1,5 +1,6 @@
 #include "app_main.h"
 #include "USB/usb_device_vcp.h"
+#include "usbd_cdc_if.h"
 #include "Motor/dji_m2006_motor.hpp"
 #include "IMU/mpu6500_ist8310.hpp"
 #include "IMU/Adafruit_AHRS_Mahony.h"
@@ -28,6 +29,7 @@ extern TIM_HandleTypeDef htim2;
 Timer pwm_signal(&htim2, 2, TIM32Bit);
 
 USB_VCP usb;
+extern uint8_t buffer[64];
 
 extern UART_HandleTypeDef huart2;
 USART serial(&huart2);
@@ -92,12 +94,37 @@ void setup(void) {
 }
 
 void defaultLoop(void) {
+	if(!has_setup) return;
 
-//	if(!has_setup) return;
+	std::string space = "xxxxxx\n\r";
+	usb.send_packet(space);
+	delay(300);
 
-//	while (true) {
-//		usbWriteLoop();
-//	}
+	int buffer_len = sizeof(buffer)/sizeof(uint8_t);
+
+	std::ostringstream convert;
+	for (int a = 0; a < buffer_len; a++) {
+	    convert << (int)buffer[a];
+	}
+
+	std::string key_string = convert.str();
+
+//	std::cout << key_string << std::endl;
+	serial << key_string << stf::endl;
+
+//	string_buffer = String((const char*)buffer);
+
+//	std::string line = usb.read_line('\r');
+//	usb.send_packet(buffer);
+
+//	std::string str = "";
+//
+//	size_t bufflen = sizeof(buffer);
+//	memcpy( str, buffer, bufflen );
+//	str[bufflen] = '\0'; // 'str' is now a string
+
+
+//	serial << buffer_len << stf::endl;
 
 
 //
@@ -142,9 +169,6 @@ void defaultLoop(void) {
 
 
 	delay(1000);
-//    while(true) { // do nothing
-//    	delay(1000);
-//    }
 }
 
 
@@ -162,10 +186,10 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-	if (has_setup) {
-		motors.pid_update_motor_currents();
-		delay(motors.get_ctrl_period_ms());
-	}
+//	if (has_setup) {
+//		motors.pid_update_motor_currents();
+//		delay(motors.get_ctrl_period_ms());
+//	}
 
 	delay(1000);
 }
@@ -286,59 +310,6 @@ void actuatorsLoop(void) {
 	delay(1000);
 }
 
-void usbReadLoop(void){
-	if(has_setup) {
-		std::string line = usb.read_line('\n');
-//		usb.send_packet(line.append("\n"));
-		const char* line_cstring = line.c_str();
-//		std::string line = "Test";
-
-		///xQueueOverwrite(io_message_queue, line_cstring);
-
-		serial << line << stf::endl;
-	}
-
-//	while(true){
-//		std::string test_string = usb.read_line();
-//		std::string space = "GME to Pluto\n\r";
-//		usb.send_packet(test_string.append(space));
-//	}
-	delay(1000);
-}
-
-// Write from RoboMaster to RP4
-void usbWriteLoop(void){
-	if(has_setup){
-
-		std::string space = "xxxxxx\n";
-		usb.send_packet(space);
-		delay(300);
-
-//		char cmd[64];
-//		int length;
-//
-//
-//		xQueueReceive(io_message_queue, cmd, 300);
-//
-//		length = strlen(cmd);
-//
-//		std::string cmd_str = std::string((const char*) cmd, length);
-//
-//		usb.send_packet(cmd_str.append("\n"));
-
-
-	}
-
-//	while(true){
-//		//std::string test_string = usb.read_line();
-//		std::string space = "GME to Pluto\n";
-//		// usb.send_packet(test_string.append(space));
-//        usb.send_packet(space);
-//
-//	}
-	//delay(1000);
-
-}
 
 
 
