@@ -146,6 +146,7 @@ void defaultLoop(void) {
 //    while(true) { // do nothing
 //    	delay(1000);
 //    }
+	delay(1000);
 }
 
 
@@ -163,10 +164,11 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-	if (is_motor_initialized) {
-		motors.pid_update_motor_currents();
-		delay(motors.get_ctrl_period_ms());
-	}
+//	if (is_motor_initialized) {
+//		motors.pid_update_motor_currents();
+//		delay(motors.get_ctrl_period_ms());
+//	}
+	delay(1000);
 }
 
 void updateIMULoop(void) {
@@ -208,58 +210,58 @@ void sensorsLoop(void) {
 }
 
 void actuatorsLoop(void) {
-	if(is_message_queue_initialized && is_usb_initialized && is_motor_initialized){
-		char cmd[64];
-		int length;
-		std::string cmd_str = "0,0,0";
-		Parsed_cmd parsed_cmd;
-		Wheel_speeds ws;
-
-		memset(cmd, 64, sizeof(char));
-
-		parsed_cmd.x = 0;
-		parsed_cmd.y = 0;
-		parsed_cmd.omega = 0;
-
-		ws.RF = 0;
-		ws.RB = 0;
-		ws.LF = 0;
-		ws.LB = 0;
-
-		// wait until white button is pressed to proceed, for safety reasons
-		while(button.read() == Low){
-			motors.set_current(0, 0, 0, 0);
-		}
-
-
-		// motors.motor_test(DjiRM::Motor2);
-		while(1){
-			// Mapping: RF, RB, LB, LF
-			motors.set_velocity(ws.RF, ws.RB, ws.LB, ws.LF);
-	//		delay(2000);
-	//		motors.set_velocity(25, 25, 25, 25);
-	//		delay(2000);
-//			motors.set_velocity(50, 50, 50, 50);
-	//		motors.set_velocity(100, 100, 100, 100);
-
-			xQueuePeek(io_message_queue, cmd, 0);
-			length = strlen(cmd);
-
-			if(length < 4) continue;
-
-			cmd_str = std::string((const char*) cmd, length);
+//	if(is_message_queue_initialized && is_usb_initialized && is_motor_initialized){
+//		char cmd[64];
+//		int length;
+//		std::string cmd_str = "0,0,0";
+//		Parsed_cmd parsed_cmd;
+//		Wheel_speeds ws;
 //
-			parsed_cmd = DjiRM::M2006_Motor::parse_cmd(cmd_str);
-
-			ws = DjiRM::M2006_Motor::bw_transformation(parsed_cmd.x, parsed_cmd.y, parsed_cmd.omega);
-
-
-			delay(1000);
-		}
-
-		motors.stop();
-		motors.set_current(0, 0, 0, 0);
-	}
+//		memset(cmd, 64, sizeof(char));
+//
+//		parsed_cmd.x = 0;
+//		parsed_cmd.y = 0;
+//		parsed_cmd.omega = 0;
+//
+//		ws.RF = 0;
+//		ws.RB = 0;
+//		ws.LF = 0;
+//		ws.LB = 0;
+//
+//		// wait until white button is pressed to proceed, for safety reasons
+//		while(button.read() == Low){
+//			motors.set_current(0, 0, 0, 0);
+//		}
+//
+//
+//		// motors.motor_test(DjiRM::Motor2);
+//		while(1){
+//			// Mapping: RF, RB, LB, LF
+//			motors.set_velocity(ws.RF, ws.RB, ws.LB, ws.LF);
+//	//		delay(2000);
+//	//		motors.set_velocity(25, 25, 25, 25);
+//	//		delay(2000);
+////			motors.set_velocity(50, 50, 50, 50);
+//	//		motors.set_velocity(100, 100, 100, 100);
+//
+//			xQueuePeek(io_message_queue, cmd, 0);
+//			length = strlen(cmd);
+//
+//			if(length < 4) continue;
+//
+//			cmd_str = std::string((const char*) cmd, length);
+////
+//			parsed_cmd = DjiRM::M2006_Motor::parse_cmd(cmd_str);
+//
+//			ws = DjiRM::M2006_Motor::bw_transformation(parsed_cmd.x, parsed_cmd.y, parsed_cmd.omega);
+//
+//
+//			delay(1000);
+//		}
+//
+//		motors.stop();
+//		motors.set_current(0, 0, 0, 0);
+//	}
 	delay(1000);
 }
 
@@ -268,26 +270,36 @@ void usbReadLoop(void){
 		std::string line = usb.read_line('\n');
 //		usb.send_packet(line.append("\n"));
 		const char* line_cstring = line.c_str();
-//		std::string line = "Test";
+//		serial << line.c_str() << stf::endl;
 
-		xQueueOverwrite(io_message_queue, line_cstring);
+		xQueueSendToBack(io_message_queue, line_cstring, 0);
+//		serial << "Sending Queue back..." << stf::endl;
 	}
+
+	delay(100);
 }
 
 // Write from RoboMaster to RP4
 void usbWriteLoop(void){
-//	if(is_usb_initialized && is_message_queue_initialized){
-//		char cmd[64];
-//		int length;
-//
-//		xQueueReceive(io_message_queue, cmd, 300);
-//
-//		length = strlen(cmd);
-//
-//		std::string cmd_str = std::string((const char*) cmd, length);
-//
-//		usb.send_packet(cmd_str.append("\n"));
-//	}
+	if(is_usb_initialized && is_message_queue_initialized){
+		char cmd[64];
+		int length;
+
+
+		// pdTrue if received, otherwise returns pdFalse
+		bool check = xQueueReceive(io_message_queue, cmd, 0);
+
+		if (check) {
+			serial << "Queue received..." << stf::endl;
+			length = strlen(cmd);
+
+			std::string cmd_str = std::string((const char*) cmd, length);
+
+			usb.send_packet(cmd_str.append("\n"));
+
+			serial << cmd << stf::endl;
+		}
+	}
 
 	delay(1000);
 
