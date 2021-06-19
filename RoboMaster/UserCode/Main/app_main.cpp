@@ -36,7 +36,7 @@ USART serial(&huart2);
 
 extern CAN_HandleTypeDef hcan1;
 // DJI EX: P = 1.5, I = 0.1
-DjiRM::M2006_Motor motors(&hcan1, 1.5, 10, 0.1); // Manually Enter PID consts here (P.S.: can also use update_pid_const(...) to dynamically updating them later)
+DjiRM::M2006_Motor motors(&hcan1, 1.5, 10, 0); // Manually Enter PID consts here (P.S.: can also use update_pid_const(...) to dynamically updating them later)
 
 extern SPI_HandleTypeDef hspi4;
 SPI ras_spi(&hspi4);
@@ -45,10 +45,6 @@ extern SPI_HandleTypeDef hspi5;
 SPI imu_spi(&hspi5);
 GPIO imu_chip_select(SPI5_CS_GPIO_Port, SPI5_CS_Pin);
 MPU6500_IST8310 imu(imu_spi, imu_chip_select);
-Adafruit_Mahony ahrs;
-float ahrs_update_freq = 50; // Hz
-
-
 
 GPIO ras_spi_cs(SPI4_CS_GPIO_Port, SPI4_CS_Pin);
 GPIO ist8310_reset(IST8310_Reset_GPIO_Port, IST8310_Reset_Pin);
@@ -65,20 +61,15 @@ void setup(void) {
     serial << "=========================================================" << stf::endl;
     serial << "Program Started" << stf::endl;
 
-
     motor_power_switch_01.write(High);
     motor_power_switch_02.write(High);
     motor_power_switch_03.write(High);
     motor_power_switch_04.write(High);
 
-//    serial << "Before motor init" << stf::endl;
 	motors.init();
-//	serial << "After Motor init " << stf::endl;
 
 	pwm_signal.init_pwm_generation(1000, 1000);
 	pwm_signal.pwm_generation_begin(Channel2);
-
-
 
 	io_message_queue = xQueueCreate(3, 64);
 
@@ -88,7 +79,6 @@ void setup(void) {
     imu.calibrate();
     serial << "IMU[MPU6500] ID = " << int(id) << stf::endl;
 
-
     blinkLED_switch = true;
     has_setup = true;
 }
@@ -96,53 +86,21 @@ void setup(void) {
 void defaultLoop(void) {
 	if(!has_setup) return;
 
-	std::string space = "xxxxxx\n\r";
-	usb.send_packet(space);
-	delay(300);
-
-	int buffer_len = sizeof(buffer)/sizeof(uint8_t);
-
-	std::ostringstream convert;
-	for (int a = 0; a < buffer_len; a++) {
-	    convert << (int)buffer[a];
+    // wait until white button is pressed to proceed, for safety reasons
+	while(button.read() == Low){
+		motors.set_current(0, 0, 0, 0);
 	}
 
-	std::string key_string = convert.str();
-
-//	std::cout << key_string << std::endl;
-	serial << key_string << stf::endl;
-
-//	string_buffer = String((const char*)buffer);
-
-//	std::string line = usb.read_line('\r');
-//	usb.send_packet(buffer);
-
-//	std::string str = "";
-//
-//	size_t bufflen = sizeof(buffer);
-//	memcpy( str, buffer, bufflen );
-//	str[bufflen] = '\0'; // 'str' is now a string
-
-
-//	serial << buffer_len << stf::endl;
-
-
-//
-    // wait until white button is pressed to proceed, for safety reasons
-//	while(button.read() == Low){
-//		motors.set_current(0, 0, 0, 0);
-//	}
-//
-//    // motors.motor_test(DjiRM::Motor2);
-//	while(true){
-////		motors.set_velocity(10, 10, 10, 10);
-//////		delay(2000);
-//		motors.set_velocity(25, 25, 25, 25);
-//		delay(2000);
-//////		motors.set_velocity(50, 50, 50, 50);
+    // motors.motor_test(DjiRM::Motor2);
+	while(true){
+//		motors.set_velocity(10, 10, 10, 10);
 ////		delay(2000);
-//////		motors.set_velocity(100, 100, 100, 100);
-//	}
+		motors.set_velocity(25, 25, 25, 25);
+		delay(2000);
+////		motors.set_velocity(50, 50, 50, 50);
+//		delay(2000);
+////		motors.set_velocity(100, 100, 100, 100);
+	}
 
 // Check if motor runs
 //	while(true){
@@ -150,7 +108,7 @@ void defaultLoop(void) {
 //		delay(100);
 //	}
 
-	// pwm_signal.set_pwm_duty_cycle_cnt(Channel1, 50);
+// pwm_signal.set_pwm_duty_cycle_cnt(Channel1, 50);
 //	while (true) {
 //		pwm_signal.set_pwm_duty_cycle<float>(Channel2, 50);
 //	}
@@ -186,10 +144,10 @@ void blinkLEDLoop(void) {
 }
 
 void updatePIDLoop(void) {
-//	if (has_setup) {
-//		motors.pid_update_motor_currents();
-//		delay(motors.get_ctrl_period_ms());
-//	}
+	if (has_setup) {
+		motors.pid_update_motor_currents();
+		delay(motors.get_ctrl_period_ms());
+	}
 
 	delay(1000);
 }
@@ -225,29 +183,29 @@ void updateIMULoop(void) {
 
 // Allows for continuous output of motor info
 void printInfoLoop(void) {
-//	int16_t speed;
-//	float current;
-//	uint16_t angle;
-//
-//	if (has_setup) {
-//	//	// serial << "Motor on" << stf::endl;
-//		angle = motors.get_raw_angle(DjiRM::Motor2);
-//		speed = motors.get_raw_speed(DjiRM::Motor2);
-//		current = motors.get_raw_current(DjiRM::Motor2);
-//		serial << "[Angle : " << angle  << "]";
-//		serial << "[Speed : " << speed  << "]";
-//		serial << "[Current: " << current << "]";
-//		serial << "[Time stamp: " << millis() << "]" << stf::endl;
-//
-//		// float or double CANNOT be printed
-//	//	serial << (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00 / 100.0) << "."
-//	//			<< (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00) % 100 << stf::endl;
-//		delay(10); // 1000 = 1sec
-//	}
-//	else {
-//		delay(1000);
-//	}
-	delay(1000);
+	int16_t speed;
+	float current;
+	uint16_t angle;
+
+	if (has_setup) {
+		// serial << "Motor on" << stf::endl;
+		angle = motors.get_raw_angle(DjiRM::Motor1);
+		speed = motors.get_raw_speed(DjiRM::Motor1);
+		current = motors.get_raw_current(DjiRM::Motor1);
+		serial << "[Angle : " << angle  << "]";
+		serial << "[Speed : " << speed  << "]";
+		serial << "[Current: " << current << "]";
+		serial << "[Time stamp: " << millis() << "]" << stf::endl;
+
+		// float or double CANNOT be printed
+	//	serial << (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00 / 100.0) << "."
+	//			<< (int32_t)(motors.get_velocity(DjiRM::Motor3)*100.00) % 100 << stf::endl;
+		delay(10); // 1000 = 1sec
+	}
+	else {
+		delay(1000);
+	}
+//	delay(1000);
 }
 
 void sensorsLoop(void) {

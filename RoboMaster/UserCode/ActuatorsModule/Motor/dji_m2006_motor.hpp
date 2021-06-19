@@ -54,7 +54,7 @@ namespace DjiRM {
          * can not reside or share variable within a class */
 
         float pid_ctrl_freq_Hz = 5000.00; // default 5000Hz
-//      PID_Controller<float> m1_ctrl;
+//        PID_Controller<float> m1_ctrl;
 //		PID_Controller<float> m2_ctrl;
 //		PID_Controller<float> m3_ctrl;
 //		PID_Controller<float> m4_ctrl;

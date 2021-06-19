@@ -127,11 +127,12 @@ public:
     T calculate(T curr_error) {
         if(is_first_time) return first_time_handle(curr_error);
         if (is_second_time) return second_time_handle(curr_error);
-        if (is_third_time) return third_time_handle(curr_error);
+//        if (is_third_time) return third_time_handle(curr_error);
         float period = get_period();
-        T derivative = (curr_error - prev_error) / period;
+        T derivative = (curr_error - 2*prev_error + prev_error2) / period;
         this->integral += curr_error * period / 1000.000; // scale Ki to be in similar range constants
-        T output = (Kp * (curr_error - prev_error)) + (Kd * derivative) + (Ki * integral);
+        T output = (Kp * (curr_error - prev_error)) + (Ki * integral) + (Kd * derivative);
+        prev_error2 = prev_error;
         prev_error = curr_error;
         return output;
     }
@@ -176,7 +177,7 @@ private:
     bool is_first_time, is_second_time, is_third_time;
     bool is_fixed_time_interval;
     T integral;
-    T prev_error;
+    T prev_error, prev_error2;
     float period_ms; //unit: millisec
     float prev_time_ms; // unit: millisec
     float (*millis_func)(void);
@@ -189,17 +190,14 @@ private:
     }
 
     T second_time_handle(T curr_error) {
-		this->integral = curr_error - curr_error; // a workaround to get zero/zero_vector of a generic type
+		float period = get_period();
+		this->integral += curr_error * period / 1000.000;
+		T derivative = (curr_error - 2*prev_error) / period;
+		T output = (Kp * (curr_error - prev_error)) + (Ki * integral) + (Kd * derivative);
+		this->prev_error2 = prev_error;
 		this->prev_error = curr_error;
 		this->is_second_time = false;
-		return Kp * curr_error;
-	}
-
-    T third_time_handle(T curr_error) {
-		this->integral = curr_error - curr_error; // a workaround to get zero/zero_vector of a generic type
-		this->prev_error = curr_error;
-		this->is_third_time = false;
-		return Kp * curr_error;
+		return output;
 	}
 
     float get_period() {
